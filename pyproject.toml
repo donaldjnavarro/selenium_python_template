@@ -11,7 +11,8 @@ dependencies = [
     "selenium",
     "pytest",
     "python-dotenv",
-    "cffi (==1.17.0)"
+    "cffi (==1.17.0)",
+    "requests"
 ]
 
 [tool.pytest.ini_options]
