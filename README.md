@@ -18,6 +18,8 @@ The .env file is not version controlled so that we can store secrets and anythin
 
 To get started, copy the *.env.template* file and remove the *.template* from the filename. This will provide you with a starting point, and a map of the expected variable names.
 
+> NOTE: This means that any additional variables added to the *.env* file should also have their names added to the *.env.template* file
+
 ## Usage
 
 ### Cleaning up old installations
