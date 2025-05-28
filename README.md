@@ -80,3 +80,19 @@ To add a new package tothe project:
 **Test execution:** Pytest
 
 **Assertions:** Pytest
+
+### Linting
+
+We are currently using the Ruff library for linting
+
+To check the files for lint, use the command:
+
+```bash
+poetry run ruff check .
+```
+
+To have ruff fix the issues it finds, use the command:
+
+```bash
+poetry run ruff check . --fix
+```

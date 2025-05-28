@@ -1,5 +1,4 @@
 """Example snippets for Python automated testing using Craigslist as a test subject"""
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.common.keys import Keys

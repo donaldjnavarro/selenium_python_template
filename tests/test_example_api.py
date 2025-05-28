@@ -1,9 +1,10 @@
+import json
 import requests
 import os
-from dotenv import load_dotenv
-load_dotenv()
-import json
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
 logger = logging.getLogger(__name__)
 
 def test_example_postman_echo_get():

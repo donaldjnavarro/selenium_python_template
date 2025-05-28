@@ -13,7 +13,8 @@ dependencies = [
     "python-dotenv",
     "cffi (==1.17.0)",
     "requests",
-    "webdriver-manager"
+    "webdriver-manager",
+    "ruff"
 ]
 
 [tool.pytest.ini_options]
@@ -27,3 +28,6 @@ testpaths = [
 packages = [
   { include = "src" }
 ]
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.11.11"
+

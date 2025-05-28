@@ -26,7 +26,8 @@ jobs:
         echo CI=true >> .env
         echo HEADLESS=true >> .env
         echo PARALLEL=false >> .env
-        echo DISPLAY_PRINTS=false >> .env
+        echo LOG_CLI=false >> .env
+        echo LOG_LEVEL=CRITICAL >> .env
         cat .env
     - name: Run Selenium tests
       run: poetry run pytest --maxfail=1 --disable-warnings -v
@@ -34,11 +35,5 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-      - name: Install ESLint
-        run: npm install eslint
-      - name: Run ESLint
-        run: npx eslint --max-warnings=0
+      - name: Run linter
+        run: poetry run ruff check .
