@@ -1,18 +1,10 @@
 # Python Selenium Template
 
-## Package Management
-
-Poetry with *pyproject.toml* handle the package dependencies.
-
-```bash
-poetry install
-```
-
-## Prerequisites
+## Setup
 
 * chromedriver is in PATH
 
-## .env - Secrets and non-version controlled data
+### .env - Secrets and non-version controlled data
 
 The .env file is not version controlled so that we can store secrets and anything that you want to be user specific.
 
@@ -40,4 +32,51 @@ poetry install
 poetry run pytest
 ```
 
-This runs pytest, which will run all the tests in the */test/* folder (Or any files you named with the *test_\*.py* namescheme, but these existing outside of the designated folder will throw warnings.)
+This runs pytest, which will run ALL tests in the */test/* folder
+
+> Note: Technically this command will run all files you named with the *test_\*.py* namescheme, but placing these files  outside of the designated folder will throw Pytest warnings.
+
+The best approach is to use the above command, but `pytest` alone will generally work as well. However running test files directly with `python tests/test_example_api.py` will not work, as Pytest fixtures have been incorporated.
+
+#### Running Specific Tests
+
+If you only want to run a specific test, you can do so by naming the test file at the end of the command:
+
+```bash
+poetry run pytest tests/test_example_api.py
+```
+
+#### Browser specific handling
+
+By default, Pytest will use its fixtures to all tests and then continue to the next web browser and run all the tests again.
+
+## Overview
+
+### Package Management
+
+Poetry with *pyproject.toml* handle the package dependencies.
+
+```bash
+poetry install
+```
+
+#### Adding packages (Basic Poetry usage)
+
+To add a new package tothe project:
+
+1. Add it to *pyproject.toml* dependencies array
+2. Run `poetry lock`
+3. Run `poetry install`
+4. Commit and submit the contribution without sneaking in other changes to the lock file
+
+### Automation Framework
+
+**Web browser automation:** Selenium
+
+**API automation:** Python's request package
+
+### Testing Framework
+
+**Test execution:** Pytest
+
+**Assertions:** Pytest
