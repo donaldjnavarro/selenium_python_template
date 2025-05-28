@@ -3,6 +3,8 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 import json
+import logging
+logger = logging.getLogger(__name__)
 
 def test_example_postman_echo_get():
     """Example test for a GET request using Postman Echo API"""
@@ -45,6 +47,8 @@ def test_example_postman_basic_auth():
     url = "https://postman-echo.com/basic-auth"
     postman_username = os.getenv("POSTMAN_USERNAME")
     postman_password = os.getenv("POSTMAN_PASSWORD")
+    if (not postman_username or not postman_password):
+        raise RuntimeError("Postman credentials not found in .env file")
 
     # Send the POST request
     # response = requests.get(url, auth=(postman_username, postman_password))
