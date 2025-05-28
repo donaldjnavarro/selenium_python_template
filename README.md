@@ -96,3 +96,9 @@ To have ruff fix the issues it finds, use the command:
 ```bash
 poetry run ruff check . --fix
 ```
+
+### CICD Checks
+
+Github Actions are configured to require certain checks pass before a Pull Request is considered valid.
+
+Details are configured in *.github\workflows\selenium.yml*
