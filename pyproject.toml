@@ -12,7 +12,8 @@ dependencies = [
     "pytest",
     "python-dotenv",
     "cffi (==1.17.0)",
-    "requests"
+    "requests",
+    "webdriver-manager"
 ]
 
 [tool.pytest.ini_options]
