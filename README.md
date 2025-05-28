@@ -4,7 +4,9 @@
 
 Poetry with *pyproject.toml* handle the package dependencies.
 
-`poetry install`
+```bash
+poetry install
+```
 
 ## Prerequisites
 
@@ -18,4 +20,22 @@ To get started, copy the *.env.template* file and remove the *.template* from th
 
 ## Usage
 
-Running the command `pytest` in the top directory, will run the tests in all files beginning with *test_*
+### Cleaning up old installations
+
+```bash
+poetry env remove python
+```
+
+### Installing packages and dependencies
+
+```bash
+poetry install
+```
+
+### Running Tests
+
+```bash
+poetry run pytest
+```
+
+This runs pytest, which will run all the tests in the */test/* folder (Or any files you named with the *test_\*.py* namescheme, but these existing outside of the designated folder will throw warnings.)
