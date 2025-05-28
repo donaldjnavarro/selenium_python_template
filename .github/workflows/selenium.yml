@@ -1,44 +1,68 @@
 name: Selenium Python Tests
+
 on:
   push:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+
 jobs:
   selenium-tests:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.13.1"
-    - name: Install Poetry
-      run: |
-        curl -sSL https://install.python-poetry.org | python3 -
-        echo "$HOME/.local/bin" >> $GITHUB_PATH  # Make sure `poetry` is in PATH
-    - name: Install dependencies
-      run: poetry install
-    - name: Restore WebDriver cache
-      uses: actions/cache@v3
-      with:
-        path: drivers_cache
-        key: ${{ runner.os }}-webdriver-cache
-    - name: 'Create env file'
-      run: |
-        touch .env
-        echo CI=true >> .env
-        echo HEADLESS=true >> .env
-        echo PARALLEL=false >> .env
-        echo LOG_CLI=false >> .env
-        echo LOG_LEVEL=CRITICAL >> .env
-        cat .env
-    - name: Run Selenium tests
-      run: poetry run pytest --maxfail=1 --disable-warnings -v
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13.1"
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: poetry install
+
+      - name: Restore WebDriver cache
+        uses: actions/cache@v3
+        with:
+          path: drivers_cache
+          key: ${{ runner.os }}-webdriver-cache
+
+      - name: Create env file
+        run: |
+          touch .env
+          echo CI=true >> .env
+          echo HEADLESS=true >> .env
+          echo PARALLEL=false >> .env
+          echo LOG_CLI=false >> .env
+          echo LOG_LEVEL=CRITICAL >> .env
+          cat .env
+
+      - name: Run Selenium tests
+        run: poetry run pytest --maxfail=1 --disable-warnings -v
+
   lint:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.13.1"
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: poetry install
+
       - name: Run linter
         run: poetry run ruff check .
