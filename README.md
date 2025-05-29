@@ -1,11 +1,126 @@
 # Python Selenium Template
 
-## Pre-requisites
+## Setup
 
 * chromedriver is in PATH
-* `pip install selenium`
-* `pip install pytest`
+
+### .env - Secrets and non-version controlled data
+
+The .env file is not version controlled so that we can store secrets and anything that you want to be user specific.
+
+To get started, copy the *.env.template* file and remove the *.template* from the filename. This will provide you with a starting point, and a map of the expected variable names.
+
+> NOTE: This means that any additional variables added to the *.env* file should also have their names added to the *.env.template* file
 
 ## Usage
 
-Running `pytest` in the top directory, will run the tests in all files beginning with `test_`
+### Cleaning up old installations
+
+```bash
+poetry env remove python
+```
+
+### Installing packages and dependencies
+
+```bash
+poetry install
+```
+
+### Running Tests
+
+```bash
+poetry run pytest
+```
+
+This runs pytest, which will run ALL tests in the */test/* folder
+
+> Note: Technically this command will run all files you named with the *test_\*.py* namescheme, but placing these files  outside of the designated folder will throw Pytest warnings.
+
+The best approach is to use the above command, but `pytest` alone will generally work as well. However running test files directly with `python tests/test_example_api.py` will not work, as Pytest fixtures have been incorporated.
+
+#### Running Specific Tests
+
+If you only want to run a specific test, you can do so by naming the test file at the end of the command:
+
+```bash
+poetry run pytest tests/test_example_api.py
+```
+
+#### Browser specific handling
+
+By default, Pytest will use its fixtures to all tests and then continue to the next web browser and run all the tests again.
+
+## Overview
+
+### Package Management
+
+Poetry with *pyproject.toml* handle the package dependencies.
+
+```bash
+poetry install
+```
+
+#### Adding packages (Basic Poetry usage)
+
+To add a new package tothe project:
+
+1. Add it to *pyproject.toml* dependencies array
+2. Run `poetry lock`
+3. Run `poetry install`
+4. Commit and submit the contribution without sneaking in other changes to the lock file
+
+### Automation Framework
+
+**Web browser automation:** Selenium
+
+**API automation:** Python's request package
+
+### Testing Framework
+
+**Test execution:** Pytest
+
+**Assertions:** Pytest
+
+For more details, see the Usage section above.
+
+### Linting
+
+We are currently using the **Ruff** library for linting
+
+To check the files for lint, use the command:
+
+```bash
+poetry run ruff check .
+```
+
+To have ruff fix the issues it finds, use the command:
+
+```bash
+poetry run ruff check . --fix
+```
+
+### CICD Checks
+
+Github Actions are configured to require certain checks pass before a Pull Request is considered valid.
+
+Details are configured in *.github\workflows\selenium.yml*
+
+#### Skipping tests that use secrets
+
+To provide a more secure CICD implementation, we have handling that will skip any test that uses secrets.
+
+We accomplish this by placing a marker on any test that includes credentials or sensitive secrets that we do not want to expose.
+
+`@pytest.mark.secrets`
+
+Placing this line above any test def will cause it to be skipped if the *.env* file has `SKIP_SECRETS=true`.
+
+In *conftest.py* hooks, we skip tests based on this marker and the .env configuration.
+
+#### Skipping browsers that cannot run headless
+
+Currently Selenium's Gecko handling cannot pass the headless flag into Firefox because its compatibility is behind. So we are currently using environmental variables in *.github\workflows\selenium.yml* to make CI skip Firefox coverage.
+
+This is an undesirable approach, but for the purposes of the CI checks the remaining 2 browsers should be sufficient. The full coverage testing should be done by a human tester on a local machine with headed browsers.
+
+This is implemented via **Poetry Scripts** in */scripts/test_quiet.py* and *pyproject.toml*'s `[tool.poetry.scripts]`

@@ -1,14 +1,12 @@
 """Example snippets for Python automated testing using Craigslist as a test subject"""
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
 from selenium.webdriver.common.keys import Keys
 
-def test_example_craigslist():
+def test_example_craigslist(driver):
     """Example Selenium testL Craigslist"""
 
     # Navigate to Craigslist
-    driver = webdriver.Chrome()
     driver.get("https://newyork.craigslist.org")
 
     # Confirm the page loaded correctly
