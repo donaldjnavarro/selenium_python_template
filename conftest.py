@@ -63,7 +63,9 @@ def driver(request):
             options.add_argument("--height=1080")
 
         # Create the Firefox driver instance
-        service = FirefoxService(GeckoDriverManager().install())
+        gecko = GeckoDriverManager().install()
+        logging.critical(f"Using GeckoDriverManager: {gecko}")
+        service = FirefoxService(gecko)
         driver = webdriver.Firefox(service=service, options=options)
 
     # Edge
