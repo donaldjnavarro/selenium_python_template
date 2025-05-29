@@ -39,8 +39,11 @@ def driver(request):
 
         # Headless Chrome configuration
         if headless:
-            options.add_argument("--headless=new")
+            options.add_argument("--headless")
             options.add_argument("--disable-gpu")
+            options.add_argument("--window-size=1920,1080")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
 
         # Create the Chrome driver instance
         driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
@@ -53,6 +56,8 @@ def driver(request):
         # Headless Firefox configuration
         if headless:
             options.headless = True
+            options.add_argument("--width=1920")
+            options.add_argument("--height=1080")
 
         # Create the Firefox driver instance
         driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
@@ -66,6 +71,9 @@ def driver(request):
         if headless:
             options.add_argument("--headless")
             options.add_argument("--disable-gpu")
+            options.add_argument("--window-size=1920,1080")
+            options.add_argument("--no-sandbox")
+            options.add_argument("--disable-dev-shm-usage")
         
         # Create the Edge driver instance
         driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=options)

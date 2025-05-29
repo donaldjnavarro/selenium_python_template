@@ -6,7 +6,7 @@ def test_example_wikipedia(driver):
     """Example Selenium test: Wikipedia"""
 
     # Navigate to Wikipedia
-    driver.get("https://www.wikipedia.com")
+    driver.get("https://www.wikipedia.org")
     
     # Confirm the page loaded
     landing_title = "Wikipedia"
