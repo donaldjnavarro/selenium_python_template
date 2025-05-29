@@ -25,32 +25,32 @@ jobs:
 
       - name: Install dependencies
         run: poetry install
+        
+      - name: Install Firefox dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+          firefox \
+          libgtk-3-0 \
+          libdbus-glib-1-2 \
+          libxt6 \
+          libxcomposite1 \
+          libxrandr2 \
+          libasound2 \
+          libatk1.0-0 \
+          libatk-bridge2.0-0 \
+          libcups2 \
+          libxss1 \
+          libnss3 \
+          libgconf-2-4 \
+          libxdamage1
 
       - name: Restore WebDriver cache
         uses: actions/cache@v3
         with:
           path: drivers_cache
           key: ${{ runner.os }}-webdriver-cache
-
-      - name: Install Firefox dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            firefox \
-            libgtk-3-0 \
-            libdbus-glib-1-2 \
-            libxt6 \
-            libxcomposite1 \
-            libxrandr2 \
-            libasound2 \
-            libatk1.0-0 \
-            libatk-bridge2.0-0 \
-            libcups2 \
-            libxss1 \
-            libnss3 \
-            libgconf-2-4 \
-            libxdamage1
-        
+      
       - name: Create env file
         run: |
           touch .env
@@ -61,6 +61,10 @@ jobs:
           echo LOG_LEVEL=CRITICAL >> .env
           echo SKIP_SECRETS=true >> .env
           cat .env
+
+      # Temporary troubleshooting
+      - name: Check Firefox version
+        run: firefox --version
 
       - name: Run Selenium tests
         run: |
