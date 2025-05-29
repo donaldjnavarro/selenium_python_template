@@ -13,8 +13,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 import logging
-from webdriver_manager.firefox import GeckoDriverManager
-from selenium.webdriver.firefox.service import Service as FirefoxService
 
 # Webdriver Manager configuration to control where the driver cache ends up
 import os
@@ -64,7 +62,6 @@ def driver(request):
 
         # Create the Firefox driver instance
         gecko = GeckoDriverManager().install()
-        logging.critical(f"Using GeckoDriverManager: {gecko}")
         service = FirefoxService(gecko)
         driver = webdriver.Firefox(service=service, options=options)
 
