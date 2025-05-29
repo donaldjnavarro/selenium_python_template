@@ -40,6 +40,7 @@ jobs:
           echo PARALLEL=false >> .env
           echo LOG_CLI=false >> .env
           echo LOG_LEVEL=CRITICAL >> .env
+          echo SKIP_SECRETS=true >> .env
           cat .env
 
       - name: Run Selenium tests
