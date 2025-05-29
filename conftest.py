@@ -111,3 +111,11 @@ def configure_logging():
 
     # Optional: if you want to control specific library logs, do here
     # logging.getLogger("selenium").setLevel(logging.WARNING)
+
+def pytest_collection_modifyitems(config, items):
+    """pytest hook to skip tests based on user configurations"""
+    skip = pytest.mark.skip(reason="Skipping tests that require secrets")
+    for item in items:
+        if "secrets" in item.keywords:
+            if os.getenv("SKIP_SECRETS", "true").lower() == "true":
+                item.add_marker(skip)

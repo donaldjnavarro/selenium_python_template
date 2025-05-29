@@ -2,6 +2,7 @@ import json
 import requests
 import os
 import logging
+import pytest
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -41,6 +42,8 @@ def test_example_postman_echo_post():
     data = response.json()
     assert data["json"] == payload, "Expected API request {} to echo back the attached payload {}, but received: {}".format(url, payload, data["json"])
 
+
+@pytest.mark.secrets
 def test_example_postman_basic_auth():
     """Example test for API requests using Basic Authentication"""
 

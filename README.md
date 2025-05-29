@@ -81,9 +81,11 @@ To add a new package tothe project:
 
 **Assertions:** Pytest
 
+For more details, see the Usage section above.
+
 ### Linting
 
-We are currently using the Ruff library for linting
+We are currently using the **Ruff** library for linting
 
 To check the files for lint, use the command:
 
@@ -102,3 +104,15 @@ poetry run ruff check . --fix
 Github Actions are configured to require certain checks pass before a Pull Request is considered valid.
 
 Details are configured in *.github\workflows\selenium.yml*
+
+#### Skipping tests that use secrets
+
+To provide a more secure CICD implementation, we have handling that will skip any test that uses secrets.
+
+We accomplish this by placing a marker on any test that includes credentials or sensitive secrets that we do not want to expose.
+
+`@pytest.mark.secrets`
+
+Placing this line above any test def will cause it to be skipped if the *.env* file has `SKIP_SECRETS=true`.
+
+In *conftest.py* hooks, we skip tests based on this marker and the .env configuration.
