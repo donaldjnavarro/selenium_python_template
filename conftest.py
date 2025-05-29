@@ -27,7 +27,14 @@ load_dotenv()
 headless = os.getenv("HEADLESS", "false").lower() == "true"
 
 # Browser fixtures
-@pytest.fixture(params=["chrome", "firefox", "edge"])
+browserConfigs = {
+    "chrome": os.getenv("CHROME", "true").lower() == "true",
+    "firefox": os.getenv("FIREFOX", "true").lower() == "true",
+    "edge": os.getenv("EDGE", "true").lower() == "true"
+}
+
+browserCoverage = [name for name, enabled in browserConfigs.items() if enabled]
+@pytest.fixture(params=browserCoverage)
 def driver(request):
     """Cross browser handling for webdriver calls"""
     browser = request.param

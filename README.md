@@ -116,3 +116,11 @@ We accomplish this by placing a marker on any test that includes credentials or 
 Placing this line above any test def will cause it to be skipped if the *.env* file has `SKIP_SECRETS=true`.
 
 In *conftest.py* hooks, we skip tests based on this marker and the .env configuration.
+
+#### Skipping browsers that cannot run headless
+
+Currently Selenium's Gecko handling cannot pass the headless flag into Firefox because its compatibility is behind. So we are currently using environmental variables in *.github\workflows\selenium.yml* to make CI skip Firefox coverage.
+
+This is an undesirable approach, but for the purposes of the CI checks the remaining 2 browsers should be sufficient. The full coverage testing should be done by a human tester on a local machine with headed browsers.
+
+This is implemented via **Poetry Scripts** in */scripts/test_quiet.py* and *pyproject.toml*'s `[tool.poetry.scripts]`
