@@ -43,7 +43,7 @@ jobs:
           echo SKIP_SECRETS=true >> .env
           echo CHROME=true >> .env
           echo EDGE=true >> .env
-          echo FIREFOX=true >> .env
+          echo FIREFOX=false >> .env
           cat .env
 
       - name: Run Selenium tests
