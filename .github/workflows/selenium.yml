@@ -63,7 +63,9 @@ jobs:
           cat .env
 
       - name: Run Selenium tests
-        run: poetry run pytest --maxfail=1 --disable-warnings -v
+        run: |
+          unset DISPLAY
+          poetry run pytest --maxfail=1 --disable-warnings -v
 
   lint:
     timeout-minutes: 60

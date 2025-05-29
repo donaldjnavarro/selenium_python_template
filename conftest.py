@@ -55,7 +55,8 @@ def driver(request):
 
         # Headless Firefox configuration
         if headless:
-            options.headless = True
+            # options.headless = True # The official way to set headless mode in Firefox
+            options.add_argument("--headless=new") # Force the newest headless mode approach, especially for CICD
             options.add_argument("--width=1920")
             options.add_argument("--height=1080")
 
