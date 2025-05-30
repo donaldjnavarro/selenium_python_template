@@ -1,19 +1,24 @@
 # run_tests.py
+from __future__ import annotations
+
 import os
-import sys
 import subprocess
+import sys
+
 from dotenv import load_dotenv
 
 
 def update_report_flag(args, required_flags="F"):
-    """
-    Ensure the -r flag includes all required summary characters.
+    """Ensure the -r flag includes all required summary characters.
+
     Mutates args in place if needed.
     """
     for i, arg in enumerate(args):
         if arg.startswith("-r"):
             existing_flags = arg[2:]
-            missing_flags = ''.join(c for c in required_flags if c not in existing_flags)
+            missing_flags = ''.join(
+                c for c in required_flags if c not in existing_flags
+            )
             if missing_flags:
                 args[i] = f"-r{existing_flags}{missing_flags}"
             return
@@ -22,9 +27,7 @@ def update_report_flag(args, required_flags="F"):
 
 
 def main():
-    """
-    Handles all customization for running tests with pytest by packing them into a single command line call.
-    """
+    """Handle all customization for running tests with a single command"""
     load_dotenv()
 
     args = sys.argv[1:]  # User-supplied args

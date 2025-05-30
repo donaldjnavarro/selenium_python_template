@@ -103,16 +103,24 @@ For more details, see the Usage section above.
 
 We are currently using the **Ruff** library for linting
 
-To check the files for lint, use the command:
+Our Poetry scripts have standardized ruff usage for our project's needs:
+
+To check for linting issues:
 
 ```bash
-poetry run ruff check .
+poetry run lint
 ```
 
 To have ruff fix the issues it finds, use the command:
 
 ```bash
-poetry run ruff check . --fix
+poetry run lint_fix
+```
+
+To have ruff fix issues of a specific rule (In this example, Ruff rule I001), use the command:
+
+```bash
+poetry run lint_fix_rule I001
 ```
 
 ### CICD Checks
