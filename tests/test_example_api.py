@@ -1,8 +1,11 @@
+from __future__ import annotations
+
 import json
-import requests
-import os
 import logging
+import os
+
 import pytest
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,11 +22,19 @@ def test_example_postman_echo_get():
     response = requests.get(url, params=params)
 
     # Confirm the request was accepted
-    assert response.status_code == 200, "Expected API request {} with params {} to return status code 200, but received: {}".format(url, params, response.status_code)
+    assert response.status_code == 200, (
+        f"API request {url} with params {params}"
+        f"Expected: Status code 200"
+        f"Actual: {response.status_code}"
+    )
     
     # Confirm the contents of the response
     data = response.json()
-    assert data["args"] == params, "Expected API request {} to echo back the attached parameters {}, but received: {}".format(url, params, data["args"])
+    assert data["args"] == params, (
+        f"API request {url}"
+        f"Expected: Response echo {params}"
+        f"Actual: {data["args"]}"
+    )
 
 def test_example_postman_echo_post():
     """Example test for a POST request using Postman Echo API"""
@@ -36,12 +47,19 @@ def test_example_postman_echo_post():
     response = requests.post(url, json=payload)
 
     # Confirm the request was accepted
-    assert response.status_code == 200, "Expected API request {} with payload {} to return status code 200, but received: {}".format(url, payload, response.status_code)
+    assert response.status_code == 200, (
+        f"API request {url} with payload {payload}"
+        f"Expected: Status code 200"
+        f"Actual: {response.status_code}"
+    )
 
     # Confirm the contents of the response
     data = response.json()
-    assert data["json"] == payload, "Expected API request {} to echo back the attached payload {}, but received: {}".format(url, payload, data["json"])
-
+    assert data["json"] == payload, (
+        f"API request {url}"
+        f"Expected: Response payload {payload}"
+        f"Actual: {data["json"]}"
+    )
 
 @pytest.mark.secrets
 def test_example_postman_basic_auth():
@@ -56,14 +74,24 @@ def test_example_postman_basic_auth():
 
     # Send the POST request
     # response = requests.get(url, auth=(postman_username, postman_password))
-    response = requests.get(url, auth=(requests.auth.HTTPBasicAuth(postman_username, postman_password)))
+    response = requests.get(
+        url,
+        auth=(requests.auth.HTTPBasicAuth(postman_username, postman_password))
+    )
 
     # Confirm the request was accepted
-    assert response.status_code == 200, "Expected API request {} to return status code 200, but received: {}".format(url, response.status_code)
+    assert response.status_code == 200, (
+        f"API request {url}"
+        f"Expected: Status code 200"
+        f"Actual: {response.status_code}"
+    )
 
     # Confirm the contents of the response
     responseJson = json.loads(response.text)
-    assert responseJson == { "authenticated": True }, "Expected API request {} to respond with JSON authenticated: true but received: {}".format(url, responseJson)
+    assert responseJson == { "authenticated": True }, (
+        f"Expected API request {url} to respond with JSON authenticated: true"
+        f"but received: {responseJson}"
+    )
 
 if __name__ == '__main__':
     test_example_postman_echo_get()

@@ -8,13 +8,14 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "selenium",
-    "pytest",
-    "python-dotenv",
-    "cffi (==1.17.0)",
-    "requests",
-    "webdriver-manager",
-    "ruff"
+    "selenium", # UI automation library
+    "pytest", # Testing framework
+    "pytest-xdist", # Provides parallel test execution
+    "python-dotenv", # .env file support
+    "cffi (==1.17.0)", # Brittle dependency for Selenium
+    "requests", # API request handling
+    "webdriver-manager", # Browser driver management so users don't have to manually provide them
+    "ruff" # Linter
 ]
 
 [tool.pytest.ini_options]
@@ -28,6 +29,41 @@ testpaths = [
 packages = [
   { include = "src" }
 ]
+
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.11.11"
 
+[tool.ruff]
+
+line-length = 79
+target-version = "py311"
+
+# Import sorting (isort settings also go under lint now)
+[tool.ruff.lint]
+select = ["E", "F", "D", "I"]
+ignore = [
+    "D100",  # Missing docstring in public module
+    "D104",  # Missing docstring in public package
+    "D105",  # Missing docstring in magic method
+    "D107",  # Missing docstring in __init__
+    "D203",  # Conflicts with Black
+    "D213",  # Conflicts with Google/NumPy docstring style
+    "D400",  # I don't require punctuation on single line comments
+    "D415",  # I don't require punctuation on single line comments
+]
+
+isort = { known-third-party = ["pytest", "selenium"], required-imports = ["from __future__ import annotations"] }
+
+# Ignore docstring rules in test files
+per-file-ignores = { "tests/*" = ["D"] }
+
+[tool.poetry.scripts]
+# Primary commands used to run tests. Commandline flags will be handled by the script based on .env handling and project-wide configurations.
+test = "scripts.run_tests:main"
+tests = "scripts.run_tests:main"
+run_tests = "scripts.run_tests:main"
+
+# Linter scripts
+lint = "scripts.run_lint:lint"
+lint_fix = "scripts.run_lint:lint_fix"
+lint_fix_rule = "scripts.run_lint:lint_fix_rule"
