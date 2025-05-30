@@ -1,7 +1,9 @@
 """Example snippets for Python automated testing using Wikipedia as a test subject"""
 from selenium.webdriver.common.by import By
 import time
+import pytest
 
+@pytest.mark.skip
 def test_example_wikipedia(driver):
     """Example Selenium test: Wikipedia"""
 

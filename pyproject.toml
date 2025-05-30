@@ -8,13 +8,14 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-    "selenium",
-    "pytest",
-    "python-dotenv",
-    "cffi (==1.17.0)",
-    "requests",
-    "webdriver-manager",
-    "ruff"
+    "selenium", # UI automation library
+    "pytest", # Testing framework
+    "pytest-xdist", # Provides parallel test execution
+    "python-dotenv", # .env file support
+    "cffi (==1.17.0)", # Brittle dependency for Selenium
+    "requests", # API request handling
+    "webdriver-manager", # Browser driver management so users don't have to manually provide them
+    "ruff" # Linter
 ]
 
 [tool.pytest.ini_options]

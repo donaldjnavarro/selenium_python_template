@@ -40,10 +40,26 @@ The best approach is to use the above command, but `pytest` alone will generally
 
 #### Running Specific Tests
 
+##### Running tests by filename
+
 If you only want to run a specific test, you can do so by naming the test file at the end of the command:
 
 ```bash
 poetry run pytest tests/test_example_api.py
+```
+
+##### Running tests by marker
+
+By adding a pytest marker line above a test's def, you can mark as part of a set of tests that we can run with a single command.
+
+```python
+@pytest.mark.marker_flag_example
+```
+
+By adding the following argument when we send the test command, only tests with `marker_flag_example` would be run:
+
+```bash
+-m "marker_flag example
 ```
 
 #### Browser specific handling
@@ -111,7 +127,9 @@ To provide a more secure CICD implementation, we have handling that will skip an
 
 We accomplish this by placing a marker on any test that includes credentials or sensitive secrets that we do not want to expose.
 
-`@pytest.mark.secrets`
+```python
+@pytest.mark.secrets
+```
 
 Placing this line above any test def will cause it to be skipped if the *.env* file has `SKIP_SECRETS=true`.
 
@@ -122,5 +140,15 @@ In *conftest.py* hooks, we skip tests based on this marker and the .env configur
 Currently Selenium's Gecko handling cannot pass the headless flag into Firefox because its compatibility is behind. So we are currently using environmental variables in *.github\workflows\selenium.yml* to make CI skip Firefox coverage.
 
 This is an undesirable approach, but for the purposes of the CI checks the remaining 2 browsers should be sufficient. The full coverage testing should be done by a human tester on a local machine with headed browsers.
+
+### Test Output
+
+A script has been included for standardizing limiting and focusing the test output, which otherwise can be excessively verbose.
+
+Using this command will run the tests via the script:
+
+```bash
+poetry run test-quiet
+```
 
 This is implemented via **Poetry Scripts** in */scripts/test_quiet.py* and *pyproject.toml*'s `[tool.poetry.scripts]`
