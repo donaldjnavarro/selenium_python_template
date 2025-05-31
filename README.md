@@ -160,3 +160,16 @@ poetry run test-quiet
 ```
 
 This is implemented via **Poetry Scripts** in */scripts/test_quiet.py* and *pyproject.toml*'s `[tool.poetry.scripts]`
+
+### Parallel Automation
+
+In an effort to speed up test runs, we have enabled pytest to run tests in parallel.
+
+This is turned on in the .env file with `PARALLEL=true`.
+
+> **NOTE:** Not all projects are suitable for parallel testing.
+> An example where this needs to be avoided would be testing a website
+> that uses a login and permanently modifies existing data. Since we
+> need our tests to have confidence in the starting state of the product
+> being tested, having multiple tests interacting with the system
+> may lead to unstable test results.

@@ -1,33 +1,30 @@
-[project]
+
+[tool.poetry]
 name = "selenium-python-template"
 version = "0.1.0"
 description = "A Python Selenium template project with pytest support."
-authors = [
-    { name="Donald Navarro", email="donaldjnavarro@gmail.com" }
-]
+authors = ["Donald Navarro <donaldjnavarro@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.8"
-dependencies = [
-    "selenium", # UI automation library
-    "pytest", # Testing framework
-    "pytest-xdist", # Provides parallel test execution
-    "python-dotenv", # .env file support
-    "cffi (==1.17.0)", # Brittle dependency for Selenium
-    "requests", # API request handling
-    "webdriver-manager", # Browser driver management so users don't have to manually provide them
-    "ruff" # Linter
+packages = [
+  { include = "src" }
 ]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+selenium = "*" # UI automation library
+pytest = "*" # Testing framework
+pytest-xdist = "*" # Provides parallel test execution
+python-dotenv = "*" # .env file support
+cffi = "==1.17.0" # Brittle dependency for Selenium
+requests = "*" # API request handling
+webdriver-manager = "*" # Browser driver management so users don't have to manually provide them
+ruff = "*" # Linter
 
 [tool.pytest.ini_options]
 minversion = "6.0"
 addopts = "-ra -q"
 testpaths = [
     "tests"
-]
-
-[tool.poetry]
-packages = [
-  { include = "src" }
 ]
 
 [tool.poetry.group.dev.dependencies]
