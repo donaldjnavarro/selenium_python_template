@@ -1,16 +1,27 @@
+"""
+Example tests that use API requests
+"""
+# Standard library imports
 from __future__ import annotations
 
+# Third-party imports
 import json
 import logging
 import os
 
+# Local imports
 import pytest
 import requests
 from dotenv import load_dotenv
 
+# Environmental variables
 load_dotenv()
+
+# Logging tools
 logger = logging.getLogger(__name__)
 
+
+@pytest.mark.example
 def test_example_postman_echo_get():
     """Example test for a GET request using Postman Echo API"""
 
@@ -36,6 +47,7 @@ def test_example_postman_echo_get():
         f"Actual: {data["args"]}"
     )
 
+@pytest.mark.example
 def test_example_postman_echo_post():
     """Example test for a POST request using Postman Echo API"""
 
@@ -61,6 +73,7 @@ def test_example_postman_echo_post():
         f"Actual: {data["json"]}"
     )
 
+@pytest.mark.example
 @pytest.mark.secrets
 def test_example_postman_basic_auth():
     """Example test for API requests using Basic Authentication"""
