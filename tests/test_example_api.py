@@ -14,9 +14,6 @@ import pytest
 import requests
 from dotenv import load_dotenv
 
-import logging
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
 
 # Environmental variables
 load_dotenv()

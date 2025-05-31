@@ -10,7 +10,7 @@ import sys
 
 # Define your custom formatter class for colorized logs and file info
 class ColoredFormatter(logging.Formatter):
-    """Custom formatter that colors the log level, file/line info, and message."""
+    """Color logs"""
     
     # Define color codes for different parts of the log
     COLORS = {
