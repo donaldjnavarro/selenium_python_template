@@ -34,7 +34,7 @@ def test_example_wikipedia(driver):
     search_box.submit()
 
     # Confirm the results of the action
-    search_results_title = "{} - Search resultsXXX".format(input_text)
+    search_results_title = "{} - Search results".format(input_text)
     Timing.wait_until_true(lambda: search_results_title in driver.title)
     assert search_results_title in driver.title, (
         "Expected '{}' to be in the page title, but received: '{}'".format(
