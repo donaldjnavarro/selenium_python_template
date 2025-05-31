@@ -14,12 +14,12 @@ import pytest
 import requests
 from dotenv import load_dotenv
 
+
 # Environmental variables
 load_dotenv()
 
 # Logging tools
 logger = logging.getLogger(__name__)
-
 
 @pytest.mark.example
 def test_example_postman_echo_get():

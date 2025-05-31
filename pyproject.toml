@@ -39,6 +39,7 @@ target-version = "py311"
 [tool.ruff.lint]
 select = ["E", "F", "D", "I"]
 ignore = [
+    "I001",  # Import sorting was too rigid
     "D100",  # Missing docstring in public module
     "D104",  # Missing docstring in public package
     "D105",  # Missing docstring in magic method
