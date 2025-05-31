@@ -28,8 +28,12 @@ poetry install
 
 ### Running Tests
 
+We have standardized the launching of our tests in a poetry script that handles running our tests.
+
+This is implemented via **Poetry Scripts** in */scripts/run_tests.py* and *pyproject.toml*'s `[tool.poetry.scripts]`
+
 ```bash
-poetry run pytest
+poetry run test
 ```
 
 This runs pytest, which will run ALL tests in the */test/* folder
@@ -45,8 +49,10 @@ The best approach is to use the above command, but `pytest` alone will generally
 If you only want to run a specific test, you can do so by naming the test file at the end of the command:
 
 ```bash
-poetry run pytest tests/test_example_api.py
+poetry run test tests/test_example_api.py
 ```
+
+> **NOTE:** This works because our run script passes your arguments in to the pytest command it uses internally.
 
 ##### Running tests by marker
 
@@ -151,15 +157,13 @@ This is an undesirable approach, but for the purposes of the CI checks the remai
 
 ### Test Output
 
-A script has been included for standardizing limiting and focusing the test output, which otherwise can be excessively verbose.
+#### Reducing Terminal Output
 
-Using this command will run the tests via the script:
+The *run_test* script includes handling for limiting and focusing the test output that is sent to the terminal, which otherwise can be excessively verbose.
 
-```bash
-poetry run test-quiet
-```
+To activate this quieter terminal output approach, update the *.env* file `QUIET=true`
 
-This is implemented via **Poetry Scripts** in */scripts/test_quiet.py* and *pyproject.toml*'s `[tool.poetry.scripts]`
+If, instead, you prefer to use your own approach of pytest flags, you can always pass pytest arguments to the test running command.
 
 ### Max Wait Times
 
