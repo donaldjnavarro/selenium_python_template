@@ -161,6 +161,18 @@ poetry run test-quiet
 
 This is implemented via **Poetry Scripts** in */scripts/test_quiet.py* and *pyproject.toml*'s `[tool.poetry.scripts]`
 
+### Max Wait Times
+
+An important aspect to UI testing is that the UI responds to our actions in a timely manner.
+
+While our tests need to wait a reasonable amount of time for web UI to update, we also cannot wait indefinitely without losing failures related to performance.
+
+Our approach to this, includes a set of methods in *utils/timing.py*, the centerpiece of which waits for an assertion that tests provide, so that we can define the specific thing that indicates we are dont waiting - We dont try to move on too early, but also don't wait for longer than we needed to.
+
+To prevent these waits from waiting indefinitely when the expected conditions are never met, or waiting too long and concealing performance issues that we want to be informed about, we define a max threshold.
+
+In the *.env* file, use `MAX_WAIT=` to define the maximum amount of seconds any wait will use. This can be adjusted based on business requirements, or set by a tester for a window determined to be reasonable (Common on environments where performance is not being tested)
+
 ### Parallel Automation
 
 In an effort to speed up test runs, we have enabled pytest to run tests in parallel.

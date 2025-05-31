@@ -1,14 +1,19 @@
 """
 Example tests for Craigslist website
 """
+# Standard library imports
 from __future__ import annotations
 
-import time
-
+# Third-party imports
+import pytest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
+# Local imports
+from utils.timing import Timing
 
+
+@pytest.mark.example
 def test_example_craigslist(driver):
     """Example Selenium testL Craigslist"""
 
@@ -32,10 +37,10 @@ def test_example_craigslist(driver):
     )
     search_box.send_keys(input_text)
     search_box.send_keys(Keys.ENTER)
-    time.sleep(3)
 
     # Confirm the results of the action
     search_results_title = "new york for sale \"{}\"".format(input_text)
+    Timing.wait_until_true(lambda: search_results_title in driver.title)
     assert search_results_title in driver.title, (
         "Expected '{}' to be in the page title, but received: '{}'".format(
               search_results_title, driver.title
