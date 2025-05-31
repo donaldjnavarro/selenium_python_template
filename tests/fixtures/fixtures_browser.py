@@ -1,12 +1,16 @@
+"""Fixtures for handling browsers"""
 
-"""Pytest shared fixtures"""
+# Standard imports
 from __future__ import annotations
 
+__all__ = ['driver']  # Public fixture
+
+# Third-party imports
 import logging
-
-# Webdriver Manager configuration to control where the driver cache ends up
 import os
+from dotenv import load_dotenv
 
+# Local imports
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
@@ -19,13 +23,12 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
-os.environ["WDM_LOCAL"] = "1"
-os.environ["WDM_CACHE_DIR"] = os.path.abspath("drivers_cache")
 
 # Load .env file
-from dotenv import load_dotenv
-
 load_dotenv()
+
+# Launch the logger
+logger = logging.getLogger(__name__)
 
 # Determine if the .env file has been configured for headless mode
 headless = os.getenv("HEADLESS", "false").lower() == "true"
@@ -63,6 +66,9 @@ def driver(request):
             ), options=options
         )
 
+        version = driver.capabilities['chrome']['chromedriverVersion']
+        logger.info(f"Chrome version: {version}")
+
     # Firefox
     elif browser == "firefox":
         # Firefox base options
@@ -81,6 +87,8 @@ def driver(request):
         gecko = GeckoDriverManager().install()
         service = FirefoxService(gecko)
         driver = webdriver.Firefox(service=service, options=options)
+        firefox_version = driver.capabilities['browserVersion']
+        logger.info(f"Firefox version: {firefox_version}")
 
     # Edge
     elif browser == "edge":
@@ -101,59 +109,11 @@ def driver(request):
                 EdgeChromiumDriverManager().install()
             ), options=options
         )
-
+        edge_version = driver.capabilities['browserVersion']
+        logger.info(f"Edge version: {edge_version}")
     else:
         raise ValueError(f"Unsupported browser: {browser}")
 
     driver.maximize_window()
     yield driver
     driver.quit()
-
-def pytest_addoption(parser):
-    """Space for adding custom command line options for pytest"""
-    pass
-
-def pytest_configure(config):
-    """Print statements are normally captured by pytest.
-
-    We disable this if the user indicates they want to see the output
-    """
-    # Load env variable, default to false
-    print_output = os.getenv("DISPLAY_PRINTS", "false").lower() == "true"
-
-    if print_output:
-        # Disable output capture (equivalent to -s when running pytest)
-        config.option.capture = "no"
-
-@pytest.fixture(autouse=True, scope="session")
-def configure_logging():
-    """Configure logging for pytest based on environment variables"""
-    log_cli = os.getenv("LOG_CLI", "false").lower() == "true"
-    if not log_cli:
-        return
-
-    # Set the level of log that will print.
-    # Everything more severe than this will be printed.
-    # Also define a default if the .env variable is not set
-    log_level_str = os.getenv("LOG_LEVEL", "WARNING").upper()
-    log_level = getattr(logging, log_level_str, logging.DEBUG)
-
-    # Silence all trivial logs from external libraries
-    logging.getLogger().setLevel(logging.WARNING)
-
-    # Configure root logger for pytest to capture
-    logging.basicConfig(
-        level=log_level,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-    )
-
-    # Optional: if you want to control specific library logs, do here
-    # logging.getLogger("selenium").setLevel(logging.WARNING)
-
-def pytest_collection_modifyitems(config, items):
-    """Pytest hook to skip tests based on user configurations"""
-    skip = pytest.mark.skip(reason="Skipping tests that require secrets")
-    for item in items:
-        if "secrets" in item.keywords:
-            if os.getenv("SKIP_SECRETS", "true").lower() == "true":
-                item.add_marker(skip)

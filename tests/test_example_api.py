@@ -14,12 +14,15 @@ import pytest
 import requests
 from dotenv import load_dotenv
 
+import logging
+from selenium import webdriver
+from webdriver_manager.chrome import ChromeDriverManager
+
 # Environmental variables
 load_dotenv()
 
 # Logging tools
 logger = logging.getLogger(__name__)
-
 
 @pytest.mark.example
 def test_example_postman_echo_get():
