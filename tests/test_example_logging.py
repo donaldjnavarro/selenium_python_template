@@ -10,10 +10,10 @@ logger = logging.getLogger(__name__)
 def test_logging_example():
     """Test to check if logging works"""
     # logger
-    logger.debug("This is a debug log message")
-    logger.info("This is an info log message")
-    logger.warning("This is a warning log message")
-    logger.critical("This is a critical log message")
+    logger.debug("This is an example logger.debug() log")
+    logger.info("This is an example logger.info() log")
+    logger.warning("This is an example logger.warning() log")
+    logger.critical("This is an example logger.critical() log")
     # print
-    print("This is a print message")
+    print("This is an example print() message")
     assert True
