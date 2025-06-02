@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 # Conftest also runs all fixtures, so import any organized into other files
 from fixtures.fixtures_browser import driver  # noqa: F401
-from fixtures.fixtures_logging import pytest_configure  # noqa: F401
+from fixtures.fixtures_logging import LogConfigurator
 
 os.environ["WDM_LOCAL"] = "1"
 os.environ["WDM_CACHE_DIR"] = os.path.abspath("drivers_cache")
@@ -35,3 +35,9 @@ def pytest_collection_modifyitems(config, items):
 
     # Log the collection status
     logger.info(f"Modified {len(items)} test items.")
+
+def pytest_configure(config):
+    """Pytest hook to configure pytest settings"""
+
+    # Logging configurations
+    LogConfigurator().configure()
