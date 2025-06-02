@@ -23,10 +23,9 @@ def test_example_wikipedia(driver):
     home_page.load()
     
     # Confirm Wikipedia home page loaded
-    expected_home_page_title = "Wikipedia"
-    assert expected_home_page_title in driver.title, (
+    assert home_page.TITLE in driver.title, (
         f"Expected Wikipedia landing page title to contain: "
-        f"'{expected_home_page_title}'"
+        f"'{home_page.TITLE}'"
         f"But actual: '{driver.title}'"
     )
 
@@ -39,7 +38,9 @@ def test_example_wikipedia(driver):
     search_results_page.is_loaded()
 
     # Confirm Wikipedia search results page loaded for the search input
-    expected_search_results_title = f"{input_text} - Search results"
+    expected_search_results_title = f"{input_text}"
+    f"{expected_search_results_title.TITLE}"
+
     Timing.wait_until_true(
         lambda: expected_search_results_title in
         driver.title
