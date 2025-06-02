@@ -6,45 +6,41 @@ from __future__ import annotations
 
 # Third-party imports
 import pytest
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 
 # Local imports
-from utils.timing import Timing
+from page_models.examples.craigslist.ny_home_page import NYCraigslistHomePage
+from page_models.examples.craigslist.ny_search_results_page import (
+    NYCraigslistSearchResultsPage,
+)
 
 
 @pytest.mark.example
 def test_example_craigslist(driver):
-    """Example Selenium testL Craigslist"""
+    """Example Selenium test of the Craigslist website"""
 
     # Navigate to Craigslist
-    driver.get("https://newyork.craigslist.org")
+    craigslist_home_page = NYCraigslistHomePage(driver)
+    craigslist_home_page.load()
 
-    # Confirm the page loaded correctly
-    landing_title = "craigslist: new york jobs"
-    assert landing_title in driver.title, (
-        "Expected '{}' to be in the page title, but received: '{}'".format(
-            landing_title, driver.title
-        )
+    # Confirm the Craigslist home page loaded
+    assert craigslist_home_page.TITLE in driver.title, (
+        f"Expected '{craigslist_home_page.TITLE}' to be in the page title, "
+        f"but received: '{driver.title}'"
     )
 
-    # Take an action on the page
+    # Take an action: Search site
     input_text = "car"
-    search_box = driver.find_element(
-        By.XPATH, (
-            "//*[@id = 'leftbar']//input[@placeholder = 'search craigslist']"
-        )
-    )
-    search_box.send_keys(input_text)
-    search_box.send_keys(Keys.ENTER)
+    craigslist_home_page.search(input_text)
 
-    # Confirm the results of the action
-    search_results_title = "new york for sale \"{}\"".format(input_text)
-    Timing.wait_until_true(lambda: search_results_title in driver.title)
+    # Confirm the search results page loaded
+    search_results_page = NYCraigslistSearchResultsPage(driver)
+    search_results_page.is_loaded()
+
+    # Verify page title includes search terms
+    search_results_title = f"{search_results_page.TITLE} \"{input_text}\""
     assert search_results_title in driver.title, (
-        "Expected '{}' to be in the page title, but received: '{}'".format(
-              search_results_title, driver.title
-        )
+        f"Expected '{search_results_title}' to be in the page title, "
+        f"but received: '{driver.title}'"
     )
 
     # Clean up

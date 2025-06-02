@@ -6,44 +6,47 @@ from __future__ import annotations
 
 # Third-party imports
 import pytest
-from selenium.webdriver.common.by import By
 
 # Local imports
-from utils.timing import Timing
-
+from page_models.examples.wikipedia.home_page import WikipediaHomePage
+from page_models.examples.wikipedia.search_results_page import (
+    WikipediaSearchResultsPage,
+)
 
 @pytest.mark.example
 def test_example_wikipedia(driver):
     """Example Selenium test: Wikipedia"""
 
     # Navigate to Wikipedia
-    driver.get("https://www.wikipedia.org")
+    home_page = WikipediaHomePage(driver)
+    home_page.load()
     
-    # Confirm the page loaded
-    landing_title = "Wikipedia"
-    assert landing_title in driver.title, (
-        "Expected '{}' to be in the page title, but received: '{}'".format(
-            landing_title, driver.title
-        )
+    # Confirm Wikipedia home page loaded
+    assert home_page.TITLE in driver.title, (
+        f"Expected Wikipedia landing page title to contain: "
+        f"'{home_page.TITLE}'"
+        f"But actual: '{driver.title}'"
     )
 
-    # Take an action on the page
+    # Take an action: Search Wikipedia
     input_text = "Selenium UI automation"
-    search_box = driver.find_element(By.NAME, "search")
-    search_box.send_keys(input_text)
-    search_box.submit()
+    home_page.search(input_text)
 
-    # Confirm the results of the action
-    search_results_title = "{} - Search results".format(input_text)
-    Timing.wait_until_true(lambda: search_results_title in driver.title)
-    assert search_results_title in driver.title, (
-        "Expected '{}' to be in the page title, but received: '{}'".format(
-            search_results_title, driver.title
-        )
+    # Verify the search results page loaded
+    search_results_page = WikipediaSearchResultsPage(driver)
+    search_results_page.is_loaded()
+
+    # Verify the page title includes search terms
+    expected_search_results_title = f"{input_text}"
+    f"{search_results_page.TITLE}"
+    assert expected_search_results_title in driver.title, (
+        f"Expected Wikipedia search results page title to contain: "
+        f"'{expected_search_results_title}' "
+        f"but actual: '{driver.title}'"
     )
 
     # Clean up
     driver.quit()
 
 if __name__ == "__main__":
-        test_example_wikipedia()
+    test_example_wikipedia()
