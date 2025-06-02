@@ -1,4 +1,5 @@
 # api_models/postman_echo.py
+from __future__ import annotations
 from models.apis.base_api import BaseAPI
 
 class PostmanEchoAPI(BaseAPI):

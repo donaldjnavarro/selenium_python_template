@@ -1,4 +1,5 @@
 # tests/test_postman_echo.py
+from __future__ import annotations
 import os
 import pytest
 from dotenv import load_dotenv

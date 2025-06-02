@@ -1,6 +1,6 @@
 from __future__ import annotations
 from selenium.webdriver.common.by import By
-from page_models.base_page import BasePage
+from models.pages.base_page import BasePage
 from utils.timing import Timing
 
 class WikipediaHomePage(BasePage):
