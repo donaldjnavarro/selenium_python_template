@@ -63,7 +63,7 @@ class LogFormatter(logging.Formatter):
             f"{time_string}"
             f"{level_string}"
             f"{file_line_string}"
-            f"{message_string}"
+            f" {message_string}"
             f"{reset}"
     )
 
