@@ -15,14 +15,15 @@ class LogFormatter(logging.Formatter):
     This formatter is intended to be used with logging handlers
     (e.g., StreamHandler for console output or FileHandler for file output).
 
-    It formats log records with timestamps, log levels, filename and line numbers,
+    Formats log records with timestamps, log levels, filename and line numbers,
     and the log message itself. When `color=True`, it adds ANSI color codes for
     enhanced readability in terminals that support colors.
 
     Note:
         - The logging framework calls the `format()` method internally for each
           log record processed by the handler.
-        - This class should be instantiated and passed to a handler's `setFormatter()` method.
+        - This class should be instantiated and passed to a handler's
+          `setFormatter()`.
     """
     
     # Color palette for logs
@@ -45,7 +46,10 @@ class LogFormatter(logging.Formatter):
         """Format the log record with colors and structured output."""
         super().format(log)
     
-        level_color = self.colors.get(log.levelname, self.colors['RESET']) if self.color else ''
+        level_color = (
+            self.colors.get(log.levelname, self.colors['RESET'])
+            if self.color else ''
+        )
         time_color = self.colors['TIMESTAMP'] if self.color else ''
         file_color = self.colors['RESET'] if self.color else ''
         reset = self.colors['RESET'] if self.color else ''
@@ -76,7 +80,7 @@ class LogConfigurator:
       - Depends on handlers to output logs.
       - Instantiates LogFormatter and assigns it to handlers.
       - Users of this class should call `configure()` to apply logging setup.
-      - Handlers created by this class are specifically designed to work with LogFormatter.
+      - Handlers are specifically designed to work with LogFormatter.
 
     Usage example:
         config = LogConfigurator(log_dir="logs", level=logging.DEBUG)
@@ -93,7 +97,7 @@ class LogConfigurator:
         """
         Create a StreamHandler for console output.
 
-        Uses LogFormatter with color enabled for better readability in terminals.
+        Applies color for use in terminals that support ANSI colors.
 
         Returns:
             logging.StreamHandler: Configured console handler.
