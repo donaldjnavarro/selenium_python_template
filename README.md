@@ -189,3 +189,6 @@ This is turned on in the .env file with `PARALLEL=true`.
 > need our tests to have confidence in the starting state of the product
 > being tested, having multiple tests interacting with the system
 > may lead to unstable test results.
+
+> **NOTE:** Due to some technology limitations, logs won't display when the parallel flag
+> is on. Later we will either solve this, or as a compromise add logging to a local file.
