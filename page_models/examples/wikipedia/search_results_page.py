@@ -1,5 +1,5 @@
 from __future__ import annotations
-from pages.base_page import BasePage
+from page_models.base_page import BasePage
 
 class WikipediaSearchResultsPage(BasePage):
     """Page object model for the Wikipedia search results page"""

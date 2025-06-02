@@ -8,8 +8,8 @@ from __future__ import annotations
 import pytest
 
 # Local imports
-from pages.examples.wikipedia.home_page import WikipediaHomePage
-from pages.examples.wikipedia.search_results_page import (
+from page_models.examples.wikipedia.home_page import WikipediaHomePage
+from page_models.examples.wikipedia.search_results_page import (
     WikipediaSearchResultsPage,
 )
 

@@ -8,8 +8,8 @@ from __future__ import annotations
 import pytest
 
 # Local imports
-from pages.examples.craigslist.ny_home_page import NYCraigslistHomePage
-from pages.examples.craigslist.ny_search_results_page import (
+from page_models.examples.craigslist.ny_home_page import NYCraigslistHomePage
+from page_models.examples.craigslist.ny_search_results_page import (
     NYCraigslistSearchResultsPage,
 )
 

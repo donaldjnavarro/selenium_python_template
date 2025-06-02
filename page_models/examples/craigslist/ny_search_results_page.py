@@ -1,5 +1,5 @@
 from __future__ import annotations
-from pages.base_page import BasePage
+from page_models.base_page import BasePage
 
 class NYCraigslistSearchResultsPage(BasePage):
     """Page object model for the NY Craigslist search results page"""
