@@ -1,15 +1,21 @@
 from __future__ import annotations
 from selenium.webdriver.common.by import By
-from page_models.base_page import BasePage
+from selenium.webdriver.common.keys import Keys
+from models.pages.base_page import BasePage
 from utils.timing import Timing
 
-class WikipediaHomePage(BasePage):
-    """Page object model for the Wikipedia home page"""
+class NYCraigslistHomePage(BasePage):
+    """Page object model for the NY Craigslist home page"""
 
-    URL = "https://www.wikipedia.org"
-    TITLE = "Wikipedia"
+    URL = "https://newyork.craigslist.org"
+    TITLE = "craigslist: "
+    "new york jobs, apartments, for sale, services, community, and events"
     LOCATORS = {
-        "search_box": (By.XPATH, "//input[@name='search']")
+        "search_box": (
+            By.XPATH,
+            "//*[@id = 'leftbar']"
+            "//input[@placeholder = 'search craigslist']"
+        )
     }
 
     def is_loaded(self):
@@ -25,4 +31,4 @@ class WikipediaHomePage(BasePage):
         """Type into the search box and submit it"""
         search_box = self.get_element("search_box")
         search_box.send_keys(query)
-        search_box.submit()
+        search_box.send_keys(Keys.ENTER)

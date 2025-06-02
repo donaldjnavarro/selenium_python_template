@@ -192,3 +192,20 @@ This is turned on in the .env file with `PARALLEL=true`.
 
 > **NOTE:** Due to some technology limitations, logs won't display when the parallel flag
 > is on. Later we will either solve this, or as a compromise add logging to a local file.
+
+### Page Object Models
+
+This repo uses a POM (Page Object Model) approach to structuring the logical details about actions that automation takes.
+
+A few patterns emerge:
+
+* The `models/` folder has all the page model details, and the tests in `tests/` import them as needed
+* Each page model consolidates information about a given page: URL, expected page title, etc
+  * **Element locators** *(generally XPath)* are all stored at this level. This creates a single location where all the DOM references for a given page can be maintained
+  * **Page actions** are standardized as class methods within the page model. This reduces duplication and lets us maintain a single source of truth where we can reliably establish implementation details for page features
+  * **BasePage** is a core page model that all page models inherit. This is where we define universal method and fundamental structural design.
+    * Examples include the `URL` and `LOCATORS` constants are established as a pattern here, to illustrate that they are expected in all page models
+    * Other core functionality exists at this level, such as `get_element()` which defines how we take our locator dictionaries that we are creating within the page models and use them with Selenium actions.
+
+Other items of note:
+**APIs as page models** follow the same patterns as the web UI page models, though they have their own `BaseAPI` page model that serves as the API equivalent of `BasePage`.
