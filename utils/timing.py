@@ -74,5 +74,5 @@ class Timing:
             "If the subsequent assertion did not fail, this may indicate "
             "test maintenance is needed to avoid an unnecessary wait."
             # Message will be included if it was provided to this function
-            f"{(f"\n{message}" if message else "")}"
+            f"\n{message}" if message else ""
         )
