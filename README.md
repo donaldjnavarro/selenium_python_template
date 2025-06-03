@@ -1,18 +1,26 @@
 # Python Selenium Template
 
-## Setup
+## Getting Started
 
-* chromedriver is in PATH
+### Secrets and personal configurations
 
-### .env - Secrets and non-version controlled data
+#### Using the .env file
 
-The .env file is not version controlled so that we can store secrets and anything that you want to be user specific.
+We are using the **.env* file to manage secrets and personal configurations for how you want these tests to behave for an individual execution.
 
-To get started, copy the *.env.template* file and remove the *.template* from the filename. This will provide you with a starting point, and a map of the expected variable names.
+* **Not version controlled:** The .env file is not version controlled so that we can store sensitive secrets such as passwords and API keys. This also prevents personal configurations (Such as whether you want to run in parallel) from being included in commits.
 
-> NOTE: This means that any additional variables added to the *.env* file should also have their names added to the *.env.template* file
+**Getting Started:** To get started, copy the *.env.template* file and remove the *.template* from the filename. This will provide you with a starting point, and a map of the expected variable names.
 
-## Usage
+#### Adding new variables to the .env
+
+Making changes to the .env variables needs to be done in 3 places:
+
+1. **.env** file itself.
+2. **.env.template** file so new users have a clear indication of the variable you added.
+3. **.github\workflows\selenium.yml** file so that Github Actions generate their virtual .env when running CI tests.
+
+## Using the suite
 
 ### Cleaning up old installations
 
@@ -26,7 +34,7 @@ poetry env remove python
 poetry install
 ```
 
-### Running Tests
+### Running tests
 
 We have standardized the launching of our tests in a poetry script that handles running our tests.
 
@@ -72,11 +80,13 @@ By adding the following argument when we send the test command, only tests with 
 
 By default, Pytest will use its fixtures to all tests and then continue to the next web browser and run all the tests again.
 
+Which browsers are included in this coverage can be customized in the *.env* file
+
 ## Overview
 
 ### Package Management
 
-Poetry with *pyproject.toml* handle the package dependencies.
+**Poetry** with *pyproject.toml* handle the package dependencies.
 
 ```bash
 poetry install
@@ -95,7 +105,7 @@ To add a new package tothe project:
 
 **Web browser automation:** Selenium
 
-**API automation:** Python's request package
+**API automation:** Python's `request` package
 
 ### Testing Framework
 
@@ -129,13 +139,13 @@ To have ruff fix issues of a specific rule (In this example, Ruff rule I001), us
 poetry run lint_fix_rule I001
 ```
 
-### CICD Checks
+### CI/CD Checks
 
-Github Actions are configured to require certain checks pass before a Pull Request is considered valid.
+**Github Actions** are configured to require certain checks pass before a Pull Request is considered valid.
 
 Details are configured in *.github\workflows\selenium.yml*
 
-#### Skipping tests that use secrets
+#### CI Exclusions: Skipping tests that use secrets
 
 To provide a more secure CICD implementation, we have handling that will skip any test that uses secrets.
 
@@ -149,7 +159,7 @@ Placing this line above any test def will cause it to be skipped if the *.env* f
 
 In *conftest.py* hooks, we skip tests based on this marker and the .env configuration.
 
-#### Skipping browsers that cannot run headless
+#### CI Exclusions: Skipping browsers that cannot run headless
 
 Currently Selenium's Gecko handling cannot pass the headless flag into Firefox because its compatibility is behind. So we are currently using environmental variables in *.github\workflows\selenium.yml* to make CI skip Firefox coverage.
 

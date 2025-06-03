@@ -60,8 +60,8 @@ class LogFormatter(logging.Formatter):
         message_string = f"{level_color}{log.getMessage()}"
 
         return (
-            f"{time_string}"
             f"{level_string}"
+            f"{time_string}"
             f"{file_line_string}"
             f" {message_string}"
             f"{reset}"
