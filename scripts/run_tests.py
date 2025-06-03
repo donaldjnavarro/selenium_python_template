@@ -58,6 +58,13 @@ def main():
     # Display logs
     final_args += ["--disable-warnings", "-s"]
 
+    # Generate HTML report
+    if not any(arg.startswith("--html") for arg in args):
+        final_args += [
+            "--html=reports/latest_results.html",
+            "--self-contained-html"
+        ]
+
     print(f"Running test command: {' '.join(final_args)}")
     subprocess.run(final_args)
 
