@@ -6,122 +6,200 @@ import subprocess
 import sys
 import shutil
 import datetime
+from pathlib import Path
 
 from dotenv import load_dotenv
+from logging import getLogger
 
+logger = getLogger(__name__)
 
 def set_runtime_env_vars():
     """Set up and standardize environment variables for test reports."""
     # Standardize the name and location of the report directories
-    REPORT_DIR = "reports"
-
-    # Main report directory for the "latest" run
-    if "LATEST_REPORT_DIR" not in os.environ:
-        LATEST_REPORT_DIR = f"{REPORT_DIR}/latest"
-        os.environ["LATEST_REPORT_DIR"] = LATEST_REPORT_DIR
-        os.makedirs(LATEST_REPORT_DIR, exist_ok=True)
-
-    if "LATEST_SCREENSHOT_DIR" not in os.environ:
-        LATEST_SCREENSHOT_DIR = f"{REPORT_DIR}/latest/screenshots"
-        os.environ["LATEST_SCREENSHOT_DIR"] = LATEST_SCREENSHOT_DIR
-        os.makedirs(LATEST_SCREENSHOT_DIR, exist_ok=True)
+    REPORT_FOLDER = "reports"
+    LATEST_FOLDER = "latest"
+    SCREENSHOT_FOLDER = "screenshots"
 
     # Timestamped report directory for historical runs
-
+    # Store a timestamp to represent the current run
     if "RUN_TIMESTAMP" not in os.environ:
-        # Store a timestamp to represent the current run
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        os.environ["RUN_TIMESTAMP"] = timestamp
+        os.environ["RUN_TIMESTAMP"] = (
+            datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        )
 
-    if "TIMESTAMPED_REPORT_DIR" not in os.environ:
-        TIMESTAMPED_REPORT_DIR = f"{REPORT_DIR}/{timestamp}"
-        os.environ["TIMESTAMPED_REPORT_DIR"] = TIMESTAMPED_REPORT_DIR
-        os.makedirs(TIMESTAMPED_REPORT_DIR, exist_ok=True)
+    for name, path in {
+        "LATEST_REPORT_DIR": (
+            Path(REPORT_FOLDER) /
+            LATEST_FOLDER
+        ),
+        "LATEST_SCREENSHOT_DIR": (
+            Path(REPORT_FOLDER) /
+            LATEST_FOLDER /
+            SCREENSHOT_FOLDER
+        ),
+        "TIMESTAMPED_REPORT_DIR": (
+            Path(REPORT_FOLDER) /
+            os.environ['RUN_TIMESTAMP']
+        ),
+        "TIMESTAMPED_SCREENSHOT_DIR": (
+            Path(REPORT_FOLDER) /
+            os.environ['RUN_TIMESTAMP'] /
+            SCREENSHOT_FOLDER
+        )
+    }.items():
+        if name not in os.environ:
+            os.environ[name] = str(path)
+            os.makedirs(path, exist_ok=True)
 
-    if "TIMESTAMPED_SCREENSHOT_DIR" not in os.environ:
-        TIMESTAMPED_SCREENSHOT_DIR = f"{REPORT_DIR}/{timestamp}/screenshots"
-        os.environ["TIMESTAMPED_SCREENSHOT_DIR"] = TIMESTAMPED_SCREENSHOT_DIR
-        os.makedirs(TIMESTAMPED_SCREENSHOT_DIR, exist_ok=True)
+class PytestCommandBuilder:
+    """Builds and manages the pytest command arguments for running tests."""
 
+    def __init__(self, user_args: list[str]):
+        """Initialize the PytestCommandBuilder with user-provided arguments.
 
-def update_report_flag(args, required_flags="F"):
-    """Ensure the -r flag includes all required summary characters.
+        Initialization Steps:
+            - Sets up the base pytest command.
+            - Determines the report output directory
+            - Applies various configuration methods to:
+                - Update the report flag for pytest.
+                - Enable or disable quiet mode.
+                - Skip tests marked with specific markers.
+                - Configure test parallelization.
+                - Enable HTML reporting.
+                - Adjust console display settings for test output.
 
-    Mutates args in place if needed.
-    """
-    for i, arg in enumerate(args):
-        if arg.startswith("-r"):
-            existing_flags = arg[2:]
-            missing_flags = ''.join(
-                c for c in required_flags if c not in existing_flags
+        This constructor ensures that all necessary test runner 
+        configurations are applied before executing tests.
+
+        Args:
+            user_args (list[str]): A list of command-line arguments
+
+        Attributes:
+            _args (list[str]): Stores the user-provided arguments.
+            command (list[str]): The base command to invoke pytest.
+            report_path (str): The file path for the HTML test report.
+
+        """
+        self._args = user_args
+
+        # Static data
+        self.command = ["pytest"]
+        self.report_path = str(
+            Path(
+                os.getenv("LATEST_REPORT_DIR", "reports/latest")
+            ) / "test_report.html"
+        )
+
+        # Apply class logic
+        self._update_report_flag()
+        self._quiet()
+        self._skip_marked_tests()
+        self._parallelization()
+        self._html_reporting()
+        self._configure_console_display()
+
+    def _update_report_flag(self, required_flags="F"):
+        """Ensure the -r flag includes all required summary characters.
+
+        Mutates args in place if needed.
+        """
+        for i, arg in enumerate(self._args):
+            if arg.startswith("-r"):
+                existing_flags = arg[2:]
+                missing_flags = ''.join(
+                    c for c in required_flags if c not in existing_flags
+                )
+                if missing_flags:
+                    self._args[i] = f"-r{existing_flags}{missing_flags}"
+                return
+        # No -r flag found
+        self._args.insert(1, f"-r{required_flags}")
+
+    def _quiet(self):
+        """Collect flags to reduce console output verbosity.
+
+        Only applies if the QUIET environment variable is set to true.
+        """
+        if os.getenv("QUIET", "false").lower() == "true":
+            if "-q" not in self._args and "--quiet" not in self._args:
+                self._args.insert(0, "-q")
+            if not any(arg.startswith("--tb") for arg in self._args):
+                self._args.insert(0, "--tb=short")
+            self._update_report_flag(required_flags="F")
+
+    def _skip_marked_tests(self):
+        """Apply default and custom pytest markers to the test run arguments.
+
+        Skipping: Markers are used to skip tests
+        """
+        if "-m" not in self._args and "--markers" not in self._args:
+            self._args += ["-m", "not skip"]
+        else:
+            m_index = self._args.index("-m")
+            if m_index + 1 < len(self._args):
+                existing_expr = self._args[m_index + 1]
+                if "not skip" not in existing_expr:
+                    self._args[m_index + 1] = f"not skip and ({existing_expr})"
+            else:
+                # Someone passed `-m` but forgot the value
+                logger.warning("'-m' flag was passed without an argument.")
+                self._args.append("not skip")
+
+    def _parallelization(self):
+        """Add flags to enable parallel test execution if requested.
+
+        Only applies if the PARALLEL environment variable is set to true.
+        """
+        # Handle parallel flag
+        if os.getenv("PARALLEL", "false").lower() == "true":
+            if not any(arg.startswith("-n") for arg in self._args):
+                self._args.insert(1, "auto")
+                self._args.insert(1, "-n")
+            print(
+                "[\033[93mWARNING\033[0m] "
+                "Parallelization may cause logs to be suppressed."
             )
-            if missing_flags:
-                args[i] = f"-r{existing_flags}{missing_flags}"
-            return
-    # No -r flag found
-    args.insert(1, f"-r{required_flags}")
 
+    def _html_reporting(self):
+        """Add reporting-related flags to the pytest command arguments."""
+        if not any(arg.startswith("--html") for arg in self._args):
+            # HTML report pytest arguments
+            self._args += [
+                f"--html={self.report_path}",
+                "--self-contained-html"
+            ]
+    
+    def _configure_console_display(self):
+        """Add any user-supplied arguments to the final command."""
+        if "--disable-warnings" not in self._args:
+            self._args.append("--disable-warnings")
+        if "-s" not in self._args:
+            self._args.append("-s")
+
+    @property
+    def full_command(self) -> list[str]:
+        """Get the full pytest command with all arguments.
+        
+        Collects all the flags configured by this class's methods.
+        """
+        return self.command + self._args
 
 def main():
     """Handle all customization for running tests with a single command"""
-    set_runtime_env_vars()
+    # Set up environment variables
     load_dotenv()
+    set_runtime_env_vars()
 
-    args = sys.argv[1:]  # User-supplied args
-    final_args = ["pytest"] + args
-
-    # Handle parallel flag
-    if os.getenv("PARALLEL", "false").lower() == "true":
-        if not any(arg.startswith("-n") for arg in args):
-            final_args.insert(1, "auto")
-            final_args.insert(1, "-n")
-        print(
-            "[\033[93mWARNING\033[0m] "
-            "Parallelization may cause logs to be suppressed."
-        )
-
-    # Handle quiet flag
-    if os.getenv("QUIET", "false").lower() == "true":
-        if "-q" not in args and "--quiet" not in args:
-            final_args.insert(1, "-q")
-        if not any(arg.startswith("--tb") for arg in args):
-            final_args.insert(1, "--tb=short")
-        update_report_flag(final_args, required_flags="F")
-    
-    # Handle pytest markers
-    final_args = ["pytest"]
+    # Prepare terminal command
     user_args = sys.argv[1:]
-
-    # Do marker mutation on user_args, not args
-    if "-m" not in user_args:
-        final_args += ["-m", "not skip"]
-    else:
-        m_index = user_args.index("-m")
-        existing_expr = user_args[m_index + 1]
-        if "not skip" not in existing_expr:
-            user_args[m_index + 1] = f"not skip and ({existing_expr})"
-        # Avoid duplicating the original -m segment
-    final_args += user_args
-
-    # Display logs
-    final_args += ["--disable-warnings", "-s"]
-
-    # Generate HTML report
-
-    latest_report = (
-        f"{os.getenv('LATEST_REPORT_DIR', 'reports/latest')}"
-        "/test_report.html"
-    )
-
-    if not any(arg.startswith("--html") for arg in args):
-        final_args += [
-            f"--html={latest_report}",
-            "--self-contained-html",
-        ]
-
+    pytest_command_builder = PytestCommandBuilder(user_args)
+    cmd = pytest_command_builder.full_command
     # Run the full test command
-    print(f"Running test command: {' '.join(final_args)}")
-    subprocess.run(final_args)
+    print(f"Running test command: {' '.join(
+        cmd
+    )}")
+    print(f"Test run started at {os.environ['RUN_TIMESTAMP']}")
+    subprocess.run(cmd)
 
     # Copy the report into an archive with a timestamp
     if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
@@ -132,7 +210,11 @@ def main():
             )}"
             f"/test_report.html"
         )
-        shutil.copyfile(latest_report, archive_report)
+        os.makedirs(os.path.dirname(archive_report), exist_ok=True)
+        if os.path.exists(pytest_command_builder.report_path):
+            shutil.copyfile(pytest_command_builder.report_path, archive_report)
+        else:
+            print("[WARNING] No test report found to archive.")
 
 if __name__ == "__main__":
     main()
