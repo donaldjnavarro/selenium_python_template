@@ -4,10 +4,7 @@ import logging
 import os
 import sys
 
-from datetime import datetime
-from dotenv import load_dotenv
 
-load_dotenv()
 class LogFormatter(logging.Formatter):
     """
     Custom logging formatter that supports optional colorization.
@@ -83,12 +80,12 @@ class LogConfigurator:
       - Handlers are specifically designed to work with LogFormatter.
 
     Usage example:
-        config = LogConfigurator(log_dir="logs", level=logging.DEBUG)
+        config = LogConfigurator(log_dir="my_logs", level=logging.DEBUG)
         config.configure()
 
     """
 
-    def __init__(self, log_dir="logs", level=logging.INFO):
+    def __init__(self, log_dir="unknown_logs", level=logging.INFO):
         self.log_dir = log_dir
         self.level = level
         self.logger = logging.getLogger()
@@ -122,11 +119,14 @@ class LogConfigurator:
         # of the log with a timestamp in its filename
         if timestamped:
             log_filename = os.path.join(
-                self.log_dir,
-                f"{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.log"
+                os.environ.get("TIMESTAMPED_REPORT_DIR", self.log_dir),
+                "logs.log"
             )
         else:
-            log_filename = os.path.join(self.log_dir, "latest.log")
+            log_filename = os.path.join(
+                os.environ.get("LATEST_REPORT_DIR", self.log_dir),
+                "logs.log"
+            )
         
         handler = logging.FileHandler(log_filename)
         formatter = LogFormatter(color=False)
@@ -140,5 +140,5 @@ class LogConfigurator:
         self.logger.addHandler(self._create_file_handler())
         # If we want to keep old logs, we will save a second copy 
         # of the log with a timestamp in its filename
-        if os.getenv("KEEP_OLD_LOGS", "false").lower() == "true":
+        if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
             self.logger.addHandler(self._create_file_handler(timestamped=True))

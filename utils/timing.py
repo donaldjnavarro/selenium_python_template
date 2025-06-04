@@ -8,16 +8,11 @@ import os
 import time
 
 # Local imports
-from dotenv import load_dotenv
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-# Environmental variables
-load_dotenv()
-
 # Logging tools
 logger = logging.getLogger(__name__)
-
 
 class Timing:
     """Utility class for handling timing actions"""

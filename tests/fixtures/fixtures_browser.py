@@ -8,7 +8,6 @@ __all__ = ['driver']  # Public fixture
 # Third-party imports
 import logging
 import os
-from dotenv import load_dotenv
 
 # Local imports
 import pytest
@@ -23,9 +22,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
-
-# Load .env file
-load_dotenv()
 
 # Launch the logger
 logger = logging.getLogger(__name__)

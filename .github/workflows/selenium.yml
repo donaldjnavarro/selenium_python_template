@@ -43,7 +43,7 @@ jobs:
           echo EDGE=true >> .env
           echo FIREFOX=false >> .env
           echo MAX_WAIT=20 >> .env
-          echo KEEP_OLD_LOGS=false >> .env
+          echo SAVE_HISTORICAL_REPORTS=false >> .env
           cat .env
 
       - name: Run Selenium tests

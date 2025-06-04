@@ -6,7 +6,7 @@ import logging
 import os
 
 import pytest
-from dotenv import load_dotenv
+from shutil import copyfile
 
 # Conftest also runs all fixtures, so import any organized into other files
 from fixtures.fixtures_browser import driver  # noqa: F401
@@ -15,8 +15,13 @@ from fixtures.fixtures_logging import LogConfigurator
 os.environ["WDM_LOCAL"] = "1"
 os.environ["WDM_CACHE_DIR"] = os.path.abspath("drivers_cache")
 
-# Load .env file
-load_dotenv()
+# Enforce script launcher:
+# This repo is not intended to be used with raw pytest commands.
+if "RUN_TIMESTAMP" not in os.environ:
+    raise RuntimeError(
+        "Please use the provided script to run tests, not pytest directly."
+        "\n  `poetry run test`"
+    )
 
 # Load logger
 logger = logging.getLogger(__name__)
@@ -41,3 +46,33 @@ def pytest_configure(config):
 
     # Logging configurations
     LogConfigurator().configure()
+
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    """Capture screenshots on test failure and attach to HTML report."""
+    outcome = yield
+    rep = outcome.get_result()
+
+    if rep.when == "call" and rep.failed:
+        driver = item.funcargs.get("driver")
+        if driver is not None:
+            LATEST_SCREENSHOT_DIR = os.environ["LATEST_SCREENSHOT_DIR"]
+            TIMESTAMPED_SCREENSHOT_DIR = os.environ["TIMESTAMPED_SCREENSHOT_DIR"]
+
+            os.makedirs(LATEST_SCREENSHOT_DIR, exist_ok=True)
+            os.makedirs(TIMESTAMPED_SCREENSHOT_DIR, exist_ok=True)
+
+            file_name = f"{item.nodeid.replace('::', '_').replace('/', '_')}.png"
+            latest_screenshot_path = os.path.join(LATEST_SCREENSHOT_DIR, file_name)
+
+            driver.save_screenshot(latest_screenshot_path)
+
+            if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
+                archived_path = os.path.join(TIMESTAMPED_SCREENSHOT_DIR, file_name)
+                copyfile(latest_screenshot_path, archived_path)
+
+            if item.config.pluginmanager.hasplugin("html"):
+                from pytest_html import extras
+                extra = getattr(rep, "extra", [])
+                extra.append(extras.image(latest_screenshot_path))
+                rep.extra = extra

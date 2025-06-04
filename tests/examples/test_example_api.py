@@ -2,10 +2,7 @@
 from __future__ import annotations
 import os
 import pytest
-from dotenv import load_dotenv
 from models.apis.examples.postman_api import PostmanEchoAPI
-
-load_dotenv()
 
 @pytest.mark.example
 def test_example_postman_echo_get():
