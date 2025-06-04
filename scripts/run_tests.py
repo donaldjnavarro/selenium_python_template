@@ -87,10 +87,21 @@ def main():
         if not any(arg.startswith("--tb") for arg in args):
             final_args.insert(1, "--tb=short")
         update_report_flag(final_args, required_flags="F")
+    
+    # Handle pytest markers
+    final_args = ["pytest"]
+    user_args = sys.argv[1:]
 
-    # Default to skipping certain test groups if no markers are specified
-    if not any(arg.startswith("-m") for arg in args):
+    # Do marker mutation on user_args, not args
+    if "-m" not in user_args:
         final_args += ["-m", "not skip"]
+    else:
+        m_index = user_args.index("-m")
+        existing_expr = user_args[m_index + 1]
+        if "not skip" not in existing_expr:
+            user_args[m_index + 1] = f"not skip and ({existing_expr})"
+        # Avoid duplicating the original -m segment
+    final_args += user_args
 
     # Display logs
     final_args += ["--disable-warnings", "-s"]

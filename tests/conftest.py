@@ -57,18 +57,28 @@ def pytest_runtest_makereport(item, call):
         driver = item.funcargs.get("driver")
         if driver is not None:
             LATEST_SCREENSHOT_DIR = os.environ["LATEST_SCREENSHOT_DIR"]
-            TIMESTAMPED_SCREENSHOT_DIR = os.environ["TIMESTAMPED_SCREENSHOT_DIR"]
+            TIMESTAMPED_SCREENSHOT_DIR = os.environ[
+                "TIMESTAMPED_SCREENSHOT_DIR"
+            ]
 
             os.makedirs(LATEST_SCREENSHOT_DIR, exist_ok=True)
             os.makedirs(TIMESTAMPED_SCREENSHOT_DIR, exist_ok=True)
 
-            file_name = f"{item.nodeid.replace('::', '_').replace('/', '_')}.png"
-            latest_screenshot_path = os.path.join(LATEST_SCREENSHOT_DIR, file_name)
+            file_name = (
+                f"{item.nodeid.replace('::', '_').replace('/', '_')}.png"
+            )
+            latest_screenshot_path = os.path.join(
+                LATEST_SCREENSHOT_DIR,
+                file_name
+            )
 
             driver.save_screenshot(latest_screenshot_path)
 
             if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
-                archived_path = os.path.join(TIMESTAMPED_SCREENSHOT_DIR, file_name)
+                archived_path = os.path.join(
+                    TIMESTAMPED_SCREENSHOT_DIR,
+                    file_name
+                )
                 copyfile(latest_screenshot_path, archived_path)
 
             if item.config.pluginmanager.hasplugin("html"):
