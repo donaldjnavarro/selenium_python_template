@@ -49,7 +49,7 @@ jobs:
       - name: Run Selenium tests
         run: |
           unset DISPLAY
-            poetry run pytest --maxfail=1 --disable-warnings -v -m "not fail"
+            poetry run test --maxfail=1 --disable-warnings -v -m "not fail"
 
   lint:
     timeout-minutes: 60
