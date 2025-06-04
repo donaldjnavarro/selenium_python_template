@@ -184,24 +184,11 @@ class PytestCommandBuilder:
         """
         return self.command + self._args
 
-def main():
-    """Handle all customization for running tests with a single command"""
-    # Set up environment variables
-    load_dotenv()
-    set_runtime_env_vars()
+def historical_report(current_report_path: str | None = None):
+    """Copy the current test report to a timestamped archive.
 
-    # Prepare terminal command
-    user_args = sys.argv[1:]
-    pytest_command_builder = PytestCommandBuilder(user_args)
-    cmd = pytest_command_builder.full_command
-    # Run the full test command
-    print(f"Running test command: {' '.join(
-        cmd
-    )}")
-    print(f"Test run started at {os.environ['RUN_TIMESTAMP']}")
-    subprocess.run(cmd)
-
-    # Copy the report into an archive with a timestamp
+    Only acts if toggled on in .env
+    """
     if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
         archive_report = (
             f"{os.getenv(
@@ -211,10 +198,31 @@ def main():
             f"/test_report.html"
         )
         os.makedirs(os.path.dirname(archive_report), exist_ok=True)
-        if os.path.exists(pytest_command_builder.report_path):
-            shutil.copyfile(pytest_command_builder.report_path, archive_report)
+        if os.path.exists(current_report_path):
+            shutil.copyfile(current_report_path, archive_report)
         else:
             print("[WARNING] No test report found to archive.")
+
+def main():
+    """Handle all customization for running tests with a single command"""
+    # Set up environment variables
+    load_dotenv()
+    set_runtime_env_vars()
+
+    # Prepare pytest command for the console
+    user_args = sys.argv[1:]
+    pytest_command_builder = PytestCommandBuilder(user_args)
+    cmd = pytest_command_builder.full_command
+
+    # Run the full pytest command
+    print(f"Running test command: {' '.join(
+        cmd
+    )}")
+    print(f"Test run started at {os.environ['RUN_TIMESTAMP']}")
+    subprocess.run(cmd)
+
+    # Copy the test report into an archive with a timestamp
+    historical_report(pytest_command_builder.report_path)
 
 if __name__ == "__main__":
     main()
