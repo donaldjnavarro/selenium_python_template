@@ -4,8 +4,44 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
+import shutil
+import datetime
 
 from dotenv import load_dotenv
+
+
+def set_runtime_env_vars():
+    """Set up and standardize environment variables for test reports."""
+    # Standardize the name and location of the report directories
+    REPORT_DIR = "reports"
+
+    # Main report directory for the "latest" run
+    if "LATEST_REPORT_DIR" not in os.environ:
+        LATEST_REPORT_DIR = f"{REPORT_DIR}/latest"
+        os.environ["LATEST_REPORT_DIR"] = LATEST_REPORT_DIR
+        os.makedirs(LATEST_REPORT_DIR, exist_ok=True)
+
+    if "LATEST_SCREENSHOT_DIR" not in os.environ:
+        LATEST_SCREENSHOT_DIR = f"{REPORT_DIR}/latest/screenshots"
+        os.environ["LATEST_SCREENSHOT_DIR"] = LATEST_SCREENSHOT_DIR
+        os.makedirs(LATEST_SCREENSHOT_DIR, exist_ok=True)
+
+    # Timestamped report directory for historical runs
+
+    if "RUN_TIMESTAMP" not in os.environ:
+        # Store a timestamp to represent the current run
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        os.environ["RUN_TIMESTAMP"] = timestamp
+
+    if "TIMESTAMPED_REPORT_DIR" not in os.environ:
+        TIMESTAMPED_REPORT_DIR = f"{REPORT_DIR}/{timestamp}"
+        os.environ["TIMESTAMPED_REPORT_DIR"] = TIMESTAMPED_REPORT_DIR
+        os.makedirs(TIMESTAMPED_REPORT_DIR, exist_ok=True)
+
+    if "TIMESTAMPED_SCREENSHOT_DIR" not in os.environ:
+        TIMESTAMPED_SCREENSHOT_DIR = f"{REPORT_DIR}/{timestamp}/screenshots"
+        os.environ["TIMESTAMPED_SCREENSHOT_DIR"] = TIMESTAMPED_SCREENSHOT_DIR
+        os.makedirs(TIMESTAMPED_SCREENSHOT_DIR, exist_ok=True)
 
 
 def update_report_flag(args, required_flags="F"):
@@ -28,6 +64,7 @@ def update_report_flag(args, required_flags="F"):
 
 def main():
     """Handle all customization for running tests with a single command"""
+    set_runtime_env_vars()
     load_dotenv()
 
     args = sys.argv[1:]  # User-supplied args
@@ -50,24 +87,52 @@ def main():
         if not any(arg.startswith("--tb") for arg in args):
             final_args.insert(1, "--tb=short")
         update_report_flag(final_args, required_flags="F")
+    
+    # Handle pytest markers
+    final_args = ["pytest"]
+    user_args = sys.argv[1:]
 
-    # Default to skipping certain test groups if no markers are specified
-    if not any(arg.startswith("-m") for arg in args):
+    # Do marker mutation on user_args, not args
+    if "-m" not in user_args:
         final_args += ["-m", "not skip"]
+    else:
+        m_index = user_args.index("-m")
+        existing_expr = user_args[m_index + 1]
+        if "not skip" not in existing_expr:
+            user_args[m_index + 1] = f"not skip and ({existing_expr})"
+        # Avoid duplicating the original -m segment
+    final_args += user_args
 
     # Display logs
     final_args += ["--disable-warnings", "-s"]
 
     # Generate HTML report
+
+    latest_report = (
+        f"{os.getenv('LATEST_REPORT_DIR', 'reports/latest')}"
+        "/test_report.html"
+    )
+
     if not any(arg.startswith("--html") for arg in args):
         final_args += [
-            "--html=reports/latest_results.html",
-            "--self-contained-html"
+            f"--html={latest_report}",
+            "--self-contained-html",
         ]
 
+    # Run the full test command
     print(f"Running test command: {' '.join(final_args)}")
     subprocess.run(final_args)
 
+    # Copy the report into an archive with a timestamp
+    if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
+        archive_report = (
+            f"{os.getenv(
+                'TIMESTAMPED_REPORT_DIR',
+                'reports/unknown_timestamp'
+            )}"
+            f"/test_report.html"
+        )
+        shutil.copyfile(latest_report, archive_report)
 
 if __name__ == "__main__":
     main()
