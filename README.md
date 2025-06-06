@@ -73,7 +73,7 @@ By adding a pytest marker line above a test's def, you can mark as part of a set
 By adding the following argument when we send the test command, only tests with `marker_flag_example` would be run:
 
 ```bash
--m "marker_flag example
+-m "marker_flag example"
 ```
 
 #### Browser specific handling

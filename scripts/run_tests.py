@@ -99,10 +99,7 @@ class PytestCommandBuilder:
         self._configure_console_display()
 
     def _update_report_flag(self, required_flags="F"):
-        """Ensure the -r flag includes all required summary characters.
-
-        Mutates args in place if needed.
-        """
+        """Ensure the -r flag includes all required summary characters."""
         for i, arg in enumerate(self._args):
             if arg.startswith("-r"):
                 existing_flags = arg[2:]
@@ -112,8 +109,19 @@ class PytestCommandBuilder:
                 if missing_flags:
                     self._args[i] = f"-r{existing_flags}{missing_flags}"
                 return
-        # No -r flag found
-        self._args.insert(1, f"-r{required_flags}")
+
+        # Safe place to insert -r flag without breaking -m and its expression
+        insert_pos = len(self._args)
+        i = 0
+        while i < len(self._args):
+            if self._args[i] == "-m" and i + 1 < len(self._args):
+                i += 2  # Skip marker and its expression
+            else:
+                insert_pos = i + 1
+                i += 1
+
+        self._args.insert(insert_pos, f"-r{required_flags}")
+
 
     def _quiet(self):
         """Collect flags to reduce console output verbosity.
@@ -128,22 +136,35 @@ class PytestCommandBuilder:
             self._update_report_flag(required_flags="F")
 
     def _skip_marked_tests(self):
-        """Apply default and custom pytest markers to the test run arguments.
+        """Ensure the default marker expression includes 'not skip'."""
+        new_args = []
+        user_marker_expr_parts = []
+        i = 0
 
-        Skipping: Markers are used to skip tests
-        """
-        if "-m" not in self._args and "--markers" not in self._args:
-            self._args += ["-m", "not skip"]
-        else:
-            m_index = self._args.index("-m")
-            if m_index + 1 < len(self._args):
-                existing_expr = self._args[m_index + 1]
-                if "not skip" not in existing_expr:
-                    self._args[m_index + 1] = f"not skip and ({existing_expr})"
+        while i < len(self._args):
+            arg = self._args[i]
+            if arg == "-m":
+                i += 1
+                # Collect everything until the next flag (starts with -)
+                while (
+                    i < len(self._args)
+                    and not self._args[i].startswith("-")
+                ):
+                    user_marker_expr_parts.append(self._args[i])
+                    i += 1
             else:
-                # Someone passed `-m` but forgot the value
-                logger.warning("'-m' flag was passed without an argument.")
-                self._args.append("not skip")
+                new_args.append(arg)
+                i += 1
+
+        # Build the final marker expression
+        if user_marker_expr_parts:
+            user_expr = " ".join(user_marker_expr_parts)
+            combined_expr = f"not skip and ({user_expr})"
+        else:
+            combined_expr = "not skip"
+
+        new_args += ["-m", combined_expr]
+        self._args = new_args
 
     def _parallelization(self):
         """Add flags to enable parallel test execution if requested.
