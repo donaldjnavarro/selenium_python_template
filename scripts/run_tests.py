@@ -27,6 +27,7 @@ def set_runtime_env_vars():
             datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         )
 
+    # Create main report folders
     for name, path in {
         "LATEST_REPORT_DIR": (
             Path(REPORT_FOLDER) /
@@ -36,21 +37,56 @@ def set_runtime_env_vars():
             Path(REPORT_FOLDER) /
             LATEST_FOLDER /
             SCREENSHOT_FOLDER
-        ),
-        "TIMESTAMPED_REPORT_DIR": (
-            Path(REPORT_FOLDER) /
-            os.environ['RUN_TIMESTAMP']
-        ),
-        "TIMESTAMPED_SCREENSHOT_DIR": (
-            Path(REPORT_FOLDER) /
-            os.environ['RUN_TIMESTAMP'] /
-            SCREENSHOT_FOLDER
         )
     }.items():
         if name not in os.environ:
             os.environ[name] = str(path)
-            os.makedirs(path, exist_ok=True)
 
+    # Create archive folders
+    if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
+        for name, path in {
+            "TIMESTAMPED_REPORT_DIR": (
+                Path(REPORT_FOLDER) /
+                os.environ['RUN_TIMESTAMP']
+            ),
+            "TIMESTAMPED_SCREENSHOT_DIR": (
+                Path(REPORT_FOLDER) /
+                os.environ['RUN_TIMESTAMP'] /
+                SCREENSHOT_FOLDER
+            )
+        }.items():
+            if name not in os.environ:
+                os.environ[name] = str(path)
+                os.makedirs(path, exist_ok=True)
+
+def create_folders():
+    """Create and manage report and screenshot directories for test runs."""
+    # Delete the previous "latest" report folder if it exists
+    latest_report_dir = Path(os.environ['LATEST_REPORT_DIR'])
+
+    if latest_report_dir.exists() and latest_report_dir.is_dir():
+        shutil.rmtree(latest_report_dir)
+
+    # Create fresh directory for the new latest report
+    os.makedirs(
+        latest_report_dir,
+        exist_ok=True
+    )
+    os.makedirs(
+        Path(os.environ['LATEST_SCREENSHOT_DIR']),
+        exist_ok=True
+    )
+
+    # Create the archive directory if .env is configured for it
+    if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
+        os.makedirs(
+            Path(os.environ['TIMESTAMPED_REPORT_DIR']),
+            exist_ok=True
+        )
+        os.makedirs(
+            Path(os.environ['TIMESTAMPED_SCREENSHOT_DIR']),
+            exist_ok=True
+        )
 class PytestCommandBuilder:
     """Builds and manages the pytest command arguments for running tests."""
 
@@ -229,6 +265,7 @@ def main():
     # Set up environment variables
     load_dotenv()
     set_runtime_env_vars()
+    create_folders()
 
     # Prepare pytest command for the console
     user_args = sys.argv[1:]

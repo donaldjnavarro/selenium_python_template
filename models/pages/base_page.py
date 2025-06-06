@@ -3,6 +3,7 @@ from __future__ import annotations
 from selenium.webdriver.remote.webdriver import WebDriver
 
 from utils.timing import Timing
+from utils.dom import save_dom_on_failure
 
 class BasePage:
     """Base class for all page objects.
@@ -41,16 +42,33 @@ class BasePage:
             raise ValueError(f"Locator '{name}' not found in LOCATORS.")
         return self.driver.find_element(*locator)
     
-    def is_loaded(self):
-        """Wait until page is finished loading by checking required elements
-        
-        This can be overridden or expanded in individual page models.
-        """       
+    @save_dom_on_failure(
+        lambda self: f"{self.__class__.__name__}_is_loaded_failed.html"
+    )
+    def is_loaded(self, timeout: float = 10.0):
+        """Wait until the page is finished loading by checking URL and title.
+
+        Raises AssertionError with debug artifacts if the condition fails.
+        """
         if self.URL is not None:
-            Timing.wait_until_true(lambda: self.URL in self.driver.current_url)
-        
+            Timing.wait_until_true(
+                lambda: self.URL in self.driver.current_url,
+                timeout=timeout,
+                message=(
+                    f"Expected URL to contain '{self.URL}' "
+                    f"but got '{self.driver.current_url}'"
+                )
+            )
+
         if self.TITLE is not None:
-            Timing.wait_until_true(lambda: self.TITLE in self.driver.title)
+            Timing.wait_until_true(
+                lambda: self.TITLE in self.driver.title,
+                timeout=timeout,
+                message=(
+                    f"Expected title to contain '{self.TITLE}' "
+                    f"but got '{self.driver.title}'"
+                )
+            )
 
         return True
 
@@ -62,6 +80,6 @@ class BasePage:
 
         """
         if not self.URL:
-            raise NotImplementedError("Subclasses must define a URL.")
+            raise NotImplementedError("Page model failed to define a URL.")
         self.driver.get(self.URL)
         self.is_loaded()

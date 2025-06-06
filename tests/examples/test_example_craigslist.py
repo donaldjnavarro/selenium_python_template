@@ -15,6 +15,7 @@ from models.pages.examples.craigslist.ny_search_results_page import (
 
 
 @pytest.mark.example
+@pytest.mark.craigslist
 def test_example_craigslist(driver):
     """Example Selenium test of the Craigslist website"""
 

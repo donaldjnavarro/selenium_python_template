@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from models.pages.base_page import BasePage
 from utils.timing import Timing
+from utils.dom import save_dom_on_failure
 
 class NYCraigslistHomePage(BasePage):
     """Page object model for the NY Craigslist home page"""
@@ -18,6 +19,9 @@ class NYCraigslistHomePage(BasePage):
         )
     }
 
+    @save_dom_on_failure(
+        lambda self: f"{self.__class__.__name__}_is_loaded_failed.html"
+    )
     def is_loaded(self):
         """Check required elements have loaded"""
         super().is_loaded() # Inherit checks from BasePage
