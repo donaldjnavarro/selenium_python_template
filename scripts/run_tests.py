@@ -27,6 +27,7 @@ def set_runtime_env_vars():
             datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
         )
 
+    # Create main report folders
     for name, path in {
         "LATEST_REPORT_DIR": (
             Path(REPORT_FOLDER) /
@@ -36,20 +37,28 @@ def set_runtime_env_vars():
             Path(REPORT_FOLDER) /
             LATEST_FOLDER /
             SCREENSHOT_FOLDER
-        ),
-        "TIMESTAMPED_REPORT_DIR": (
-            Path(REPORT_FOLDER) /
-            os.environ['RUN_TIMESTAMP']
-        ),
-        "TIMESTAMPED_SCREENSHOT_DIR": (
-            Path(REPORT_FOLDER) /
-            os.environ['RUN_TIMESTAMP'] /
-            SCREENSHOT_FOLDER
         )
     }.items():
         if name not in os.environ:
             os.environ[name] = str(path)
             os.makedirs(path, exist_ok=True)
+
+    # Create archive folders
+    if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
+        for name, path in {
+            "TIMESTAMPED_REPORT_DIR": (
+                Path(REPORT_FOLDER) /
+                os.environ['RUN_TIMESTAMP']
+            ),
+            "TIMESTAMPED_SCREENSHOT_DIR": (
+                Path(REPORT_FOLDER) /
+                os.environ['RUN_TIMESTAMP'] /
+                SCREENSHOT_FOLDER
+            )
+        }.items():
+            if name not in os.environ:
+                os.environ[name] = str(path)
+                os.makedirs(path, exist_ok=True)
 
 class PytestCommandBuilder:
     """Builds and manages the pytest command arguments for running tests."""
