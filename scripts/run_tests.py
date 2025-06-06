@@ -41,7 +41,6 @@ def set_runtime_env_vars():
     }.items():
         if name not in os.environ:
             os.environ[name] = str(path)
-            os.makedirs(path, exist_ok=True)
 
     # Create archive folders
     if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
@@ -60,6 +59,34 @@ def set_runtime_env_vars():
                 os.environ[name] = str(path)
                 os.makedirs(path, exist_ok=True)
 
+def create_folders():
+    """Create and manage report and screenshot directories for test runs."""
+    # Delete the previous "latest" report folder if it exists
+    latest_report_dir = Path(os.environ['LATEST_REPORT_DIR'])
+
+    if latest_report_dir.exists() and latest_report_dir.is_dir():
+        shutil.rmtree(latest_report_dir)
+
+    # Create fresh directory for the new latest report
+    os.makedirs(
+        latest_report_dir,
+        exist_ok=True
+    )
+    os.makedirs(
+        Path(os.environ['LATEST_SCREENSHOT_DIR']),
+        exist_ok=True
+    )
+
+    # Create the archive directory if .env is configured for it
+    if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
+        os.makedirs(
+            Path(os.environ['TIMESTAMPED_REPORT_DIR']),
+            exist_ok=True
+        )
+        os.makedirs(
+            Path(os.environ['TIMESTAMPED_SCREENSHOT_DIR']),
+            exist_ok=True
+        )
 class PytestCommandBuilder:
     """Builds and manages the pytest command arguments for running tests."""
 
@@ -238,6 +265,7 @@ def main():
     # Set up environment variables
     load_dotenv()
     set_runtime_env_vars()
+    create_folders()
 
     # Prepare pytest command for the console
     user_args = sys.argv[1:]
