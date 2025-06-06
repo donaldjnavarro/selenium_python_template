@@ -14,60 +14,94 @@ from selenium.webdriver.support.ui import WebDriverWait
 # Logging tools
 logger = logging.getLogger(__name__)
 
+# Default timeout
+DEFAULT_TIMEOUT = int(os.getenv("DEFAULT_WAIT_TIMEOUT", 10))
+
 class Timing:
     """Utility class for handling timing actions"""
 
     @staticmethod
-    def wait_until_visible(driver, by, value, timeout=10):
+    def wait_until_visible(driver, by, value, timeout=DEFAULT_TIMEOUT):
         """Wait for element to be visible"""
-        return WebDriverWait(driver, timeout).until(
-            EC.visibility_of_element_located((by, value))
-        )
+        try:
+            return WebDriverWait(driver, timeout).until(
+                EC.visibility_of_element_located((by, value))
+            )
+        except Exception as e:
+            message = (
+                f"Element located by ({by}, {value}) was "
+                f"not visible after {timeout} seconds: {e}"
+            )
+            logger.error(message)
+            raise TimeoutError(message) from e
 
     @staticmethod
-    def wait_until_clickable(driver, by, value, timeout=10):
+    def wait_until_clickable(driver, by, value, timeout=DEFAULT_TIMEOUT):
         """Wait for element to be clickable"""
-        return WebDriverWait(driver, timeout).until(
-            EC.element_to_be_clickable((by, value))
-        )
+        try:
+            return WebDriverWait(driver, timeout).until(
+                EC.element_to_be_clickable((by, value))
+            )
+        except Exception as e:
+            message = (
+                f"Element located by ({by}, {value}) was "
+                f"not clickable after {timeout} seconds: {e}"
+            )
+            logger.error(message)
+            raise TimeoutError(message) from e
 
     @staticmethod
-    def wait_until_invisible(driver, by, value, timeout=10):
+    def wait_until_invisible(driver, by, value, timeout=DEFAULT_TIMEOUT):
         """Wait for element to be invisible"""
-        return WebDriverWait(driver, timeout).until(
-            EC.invisibility_of_element_located((by, value))
-        )
+        try:
+            return WebDriverWait(driver, timeout).until(
+                EC.invisibility_of_element_located((by, value))
+            )
+        except Exception as e:
+            message = (
+                f"Element located by ({by}, {value}) was "
+                f"not invisible after {timeout} seconds: {e}"
+            )
+            logger.error(message)
+            raise TimeoutError(message) from e
     
     @staticmethod
-    def wait_until_true(condition, timeout=None, interval=0.5, message=None):
-        """Wait for a callback to return True within the given timeout
+    def wait_until_true(
+        condition,
+        timeout=DEFAULT_TIMEOUT,
+        interval=0.5,
+        message=None,
+        on_timeout=None
+    ):
+        """Wait for a custom condition to return True.
 
-        Fails with AssertionError if the condition is not met in time.
-        :param condition: When this is true, the wait stops.
-        :param timeout: Max wait time (overrides .env value if provided).
-        :param interval: Polling interval in seconds.
-        :param message: Optional message to show if assertion fails.
+        Args:
+            condition (callable): Your check function.
+            timeout (float): Max time to wait in seconds.
+            interval (float): Time between checks.
+            message (str): Optional custom error message.
+            on_timeout (callable): Optional hook to run before raising.
+
         """
-        max_wait = timeout or int(os.getenv("DEFAULT_WAIT_TIMEOUT", 10))
-        end_time = time.time() + max_wait
-        last_error = None
+        end_time = time.time() + timeout
 
         while time.time() < end_time:
             try:
+                # Condition met!
                 if condition():
                     return
             except Exception as e:
-                last_error = e
+                logger.debug(f"Wait condition raised an exception: {e}")
             time.sleep(interval)
 
-        if last_error:
-            logger.error(
-                f"Error after {max_wait} seconds: {last_error}"
-            )
-        logger.error(
-            f"Condition failed after {max_wait} seconds."
-            "If the subsequent assertion did not fail, this may indicate "
-            "test maintenance is needed to avoid an unnecessary wait."
-            # Message will be included if it was provided to this function
-            f"\n{message}" if message else ""
+        if on_timeout:
+            try:
+                on_timeout()
+            except Exception as e:
+                logger.warning(f"on_timeout() raised: {e}")
+
+        final_message = message or (
+            f"Condition not met within {timeout} seconds."
         )
+        logger.error(final_message)
+        raise TimeoutError(final_message)
