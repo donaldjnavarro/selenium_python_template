@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 from pathlib import Path
+from functools import wraps
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -23,3 +25,17 @@ def save_dom(driver, filename="page_dump.html"):
     logger.info(f"DOM saved to {file_path}"
           " (This file will not be available in the timestamped archive)"
     )
+
+def save_dom_on_failure(filename_func):
+    """Save DOM when a decorated method raises an exception."""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            try:
+                return func(self, *args, **kwargs)
+            except Exception as e:
+                filename = filename_func(self)
+                save_dom(self.driver, filename)
+                raise e
+        return wrapper
+    return decorator

@@ -3,8 +3,7 @@ from __future__ import annotations
 from selenium.webdriver.remote.webdriver import WebDriver
 
 from utils.timing import Timing
-from utils.dom import save_dom  # assuming you put it there
-
+from utils.dom import save_dom_on_failure
 
 class BasePage:
     """Base class for all page objects.
@@ -43,6 +42,9 @@ class BasePage:
             raise ValueError(f"Locator '{name}' not found in LOCATORS.")
         return self.driver.find_element(*locator)
     
+    @save_dom_on_failure(
+        lambda self: f"{self.__class__.__name__}_is_loaded_failed.html"
+    )
     def is_loaded(self, timeout: float = 10.0):
         """Wait until the page is finished loading by checking URL and title.
 
@@ -55,10 +57,6 @@ class BasePage:
                 message=(
                     f"Expected URL to contain '{self.URL}' "
                     f"but got '{self.driver.current_url}'"
-                ),
-                on_timeout=save_dom(
-                    self.driver,
-                    f"{self.__class__.__name__}_is_loaded_failed_url.html"
                 )
             )
 
@@ -69,10 +67,6 @@ class BasePage:
                 message=(
                     f"Expected title to contain '{self.TITLE}' "
                     f"but got '{self.driver.title}'"
-                ),
-                on_timeout=save_dom(
-                    self.driver,
-                    f"{self.__class__.__name__}_is_loaded_failed_title.html"
                 )
             )
 
