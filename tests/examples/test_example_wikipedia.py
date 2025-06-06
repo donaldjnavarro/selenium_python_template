@@ -14,6 +14,7 @@ from models.pages.examples.wikipedia.search_results_page import (
 )
 
 @pytest.mark.example
+@pytest.mark.wikipedia
 def test_example_wikipedia(driver):
     """Example Selenium test: Wikipedia"""
 
