@@ -136,32 +136,31 @@ class PytestCommandBuilder:
             self._update_report_flag(required_flags="F")
 
     def _skip_marked_tests(self):
-        """Apply default and custom pytest markers to the test run arguments."""
+        """Ensure the default marker expression includes 'not skip'."""
         new_args = []
-        marker_expr = None
+        user_marker_expr_parts = []
         i = 0
+
         while i < len(self._args):
             arg = self._args[i]
             if arg == "-m":
-                if i + 1 < len(self._args):
-                    marker_expr = self._args[i + 1]
-                    i += 2
-                else:
-                    logger.warning("'-m' flag was passed without an argument.")
-                    marker_expr = ""
+                i += 1
+                # Collect everything until the next flag (starts with -)
+                while i < len(self._args) and not self._args[i].startswith("-"):
+                    user_marker_expr_parts.append(self._args[i])
                     i += 1
             else:
                 new_args.append(arg)
                 i += 1
 
-        # Add default marker
-        if marker_expr:
-            if "not skip" not in marker_expr:
-                marker_expr = f"not skip and ({marker_expr})"
+        # Build the final marker expression
+        if user_marker_expr_parts:
+            user_expr = " ".join(user_marker_expr_parts)
+            combined_expr = f"not skip and ({user_expr})"
         else:
-            marker_expr = "not skip"
+            combined_expr = "not skip"
 
-        new_args += ["-m", marker_expr]
+        new_args += ["-m", combined_expr]
         self._args = new_args
 
     def _parallelization(self):
