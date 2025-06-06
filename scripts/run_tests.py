@@ -146,7 +146,10 @@ class PytestCommandBuilder:
             if arg == "-m":
                 i += 1
                 # Collect everything until the next flag (starts with -)
-                while i < len(self._args) and not self._args[i].startswith("-"):
+                while (
+                    i < len(self._args)
+                    and not self._args[i].startswith("-")
+                ):
                     user_marker_expr_parts.append(self._args[i])
                     i += 1
             else:
