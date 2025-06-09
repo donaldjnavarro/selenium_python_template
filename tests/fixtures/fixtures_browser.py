@@ -2,12 +2,9 @@
 
 # Standard imports
 from __future__ import annotations
+import os
 
 __all__ = ['driver']  # Public fixture
-
-# Third-party imports
-import logging
-import os
 
 # Local imports
 import pytest
@@ -22,9 +19,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
-
 # Launch the logger
-logger = logging.getLogger(__name__)
+import logging
+logger = logging.getLogger()
 
 # Determine if the .env file has been configured for headless mode
 headless = os.getenv("HEADLESS", "false").lower() == "true"
@@ -40,6 +37,7 @@ browserCoverage = [name for name, enabled in browserConfigs.items() if enabled]
 @pytest.fixture(params=browserCoverage)
 def driver(request):
     """Cross browser handling for webdriver calls"""
+    logger.info("Running driver() in fixtures_browser.py")
     browser = request.param
 
     # Chrome

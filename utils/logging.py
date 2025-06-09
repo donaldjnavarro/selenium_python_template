@@ -1,13 +1,31 @@
+
 from __future__ import annotations
 
 import logging
 import os
 import sys
 
+LOG_FORMAT = (
+    "[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d] %(message)s"
+)
+DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+def pre_logger():
+    """Minimal logger setup for early-stage logging (before full config)."""
+    logging.basicConfig(
+        level=logging.DEBUG,
+        stream=sys.stdout,
+        format=LOG_FORMAT,
+        datefmt=DATE_FORMAT
+    )
+
+def main_logger():
+    """Full logging configuration."""
+    LogConfigurator().configure()
+
 
 class LogFormatter(logging.Formatter):
-    """
-    Custom logging formatter that supports optional colorization.
+    """Custom logging formatter that supports optional colorization.
 
     This formatter is intended to be used with logging handlers
     (e.g., StreamHandler for console output or FileHandler for file output).
@@ -21,8 +39,9 @@ class LogFormatter(logging.Formatter):
           log record processed by the handler.
         - This class should be instantiated and passed to a handler's
           `setFormatter()`.
+
     """
-    
+
     # Color palette for logs
     colors = {
         'DEBUG': '\033[94m',   # Blue
@@ -36,7 +55,7 @@ class LogFormatter(logging.Formatter):
     }
 
     def __init__(self, color=False):
-        super().__init__(fmt="%(asctime)s", datefmt="%Y-%m-%d %H:%M:%S")
+        super().__init__(fmt="%(asctime)s", datefmt=DATE_FORMAT)
         self.color = color
 
     def format(self, log):
@@ -65,8 +84,7 @@ class LogFormatter(logging.Formatter):
     )
 
 class LogConfigurator:
-    """
-    Encapsulates all logging setup for pytest runs.
+    """Encapsulates all logging setup for pytest runs.
 
     Responsibilities:
       - Creates console and file handlers.
@@ -91,13 +109,13 @@ class LogConfigurator:
         self.logger = logging.getLogger()
 
     def _create_console_handler(self):
-        """
-        Create a StreamHandler for console output.
+        """Create a StreamHandler for console output.
 
         Applies color for use in terminals that support ANSI colors.
 
         Returns:
             logging.StreamHandler: Configured console handler.
+
         """
         handler = logging.StreamHandler(sys.stdout)
         formatter = LogFormatter(color=True)
@@ -105,13 +123,13 @@ class LogConfigurator:
         return handler
 
     def _create_file_handler(self, timestamped=False):
-        """
-        Create a FileHandler to write logs to a file.
+        """Create a FileHandler to write logs to a file.
 
         Uses LogFormatter without color to keep log files clean and readable.
 
         Returns:
             logging.FileHandler: Configured file handler.
+
         """
         os.makedirs(self.log_dir, exist_ok=True)
         
@@ -134,6 +152,7 @@ class LogConfigurator:
         return handler
 
     def configure(self):
+        """Configure the main logger with all enhancements"""
         self.logger.handlers.clear()
         self.logger.setLevel(self.level)
         self.logger.addHandler(self._create_console_handler())
