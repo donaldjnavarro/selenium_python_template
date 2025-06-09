@@ -45,7 +45,7 @@ def pre_logger():
 def main_logger():
     """Full logging configuration."""
     # DETERMINE LOG LEVEL TO ACTIVATE
-    raw_level = os.getenv("LOG_LEVEL", "")
+    raw_level = os.getenv("LOG_LEVEL", "INFO")
     LOG_LEVEL_NAME = raw_level.upper()
     VALID_LOG_LEVELS = set(logging._nameToLevel)
     if LOG_LEVEL_NAME not in VALID_LOG_LEVELS:
