@@ -5,24 +5,60 @@ import logging
 import os
 import sys
 
+# Define common constants
 LOG_FORMAT = (
     "[%(levelname)s][%(asctime)s][%(filename)s:%(lineno)d] %(message)s"
 )
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
+LOG_COLORS = {
+    'DEBUG': '\033[94m',   # Blue
+    'INFO': '\033[92m',    # Green
+    'WARNING': '\033[93m', # Yellow
+    'ERROR': '\033[91m',   # Red
+    'CRITICAL': '\033[1;91m', # Bold Red
+    'TIMESTAMP': '\033[90m', # Gray (for filename and line number)
+    'MESSAGE': '\033[95m', # Purple
+    'RESET': '\033[0m',
+}
+def colorize_level(level_name: str) -> str:
+    """Return the log level name wrapped in its ANSI color code."""
+    color = LOG_COLORS.get(level_name.upper(), '')
+    reset = LOG_COLORS['RESET']
+    return f"{color}{level_name}{reset}" if color else level_name
+
 def pre_logger():
     """Minimal logger setup for early-stage logging (before full config)."""
+    prelogger_level = logging.INFO
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=prelogger_level,
         stream=sys.stdout,
         format=LOG_FORMAT,
         datefmt=DATE_FORMAT
     )
+    logging.info(
+        "Loading pre logger at level [{}]".format(
+            colorize_level(logging.getLevelName(prelogger_level))
+        )
+    )
 
 def main_logger():
     """Full logging configuration."""
-    LogConfigurator().configure()
+    # DETERMINE LOG LEVEL TO ACTIVATE
+    raw_level = os.getenv("LOG_LEVEL", "")
+    LOG_LEVEL_NAME = raw_level.upper()
+    VALID_LOG_LEVELS = set(logging._nameToLevel)
+    if LOG_LEVEL_NAME not in VALID_LOG_LEVELS:
+        raise ValueError(f"Invalid LOG_LEVEL in .env: '{raw_level}'")
+    LOG_LEVEL = logging._nameToLevel[LOG_LEVEL_NAME]
 
+    # Create logger
+    logging.info(
+        "Loading main logger at level [{}]".format(
+            colorize_level(logging.getLevelName(LOG_LEVEL))
+        )
+    )
+    LogConfigurator(level=LOG_LEVEL).configure()
 
 class LogFormatter(logging.Formatter):
     """Custom logging formatter that supports optional colorization.
@@ -42,17 +78,8 @@ class LogFormatter(logging.Formatter):
 
     """
 
-    # Color palette for logs
-    colors = {
-        'DEBUG': '\033[94m',   # Blue
-        'INFO': '\033[92m',    # Green
-        'WARNING': '\033[93m', # Yellow
-        'ERROR': '\033[91m',   # Red
-        'CRITICAL': '\033[1;91m', # Bold Red
-        'TIMESTAMP': '\033[90m', # Gray (for filename and line number)
-        'MESSAGE': '\033[95m', # Purple
-        'RESET': '\033[0m',
-    }
+    # colors defined in file constants above
+    colors = LOG_COLORS
 
     def __init__(self, color=False):
         super().__init__(fmt="%(asctime)s", datefmt=DATE_FORMAT)
@@ -98,13 +125,12 @@ class LogConfigurator:
       - Handlers are specifically designed to work with LogFormatter.
 
     Usage example:
-        config = LogConfigurator(log_dir="my_logs", level=logging.DEBUG)
+        config = LogConfigurator(level=logging.DEBUG)
         config.configure()
 
     """
 
-    def __init__(self, log_dir="unknown_logs", level=logging.INFO):
-        self.log_dir = log_dir
+    def __init__(self, level=logging.DEBUG):
         self.level = level
         self.logger = logging.getLogger()
 
@@ -130,19 +156,17 @@ class LogConfigurator:
         Returns:
             logging.FileHandler: Configured file handler.
 
-        """
-        os.makedirs(self.log_dir, exist_ok=True)
-        
+        """        
         # If we want to keep old logs, we will save a second copy 
         # of the log with a timestamp in its filename
         if timestamped:
             log_filename = os.path.join(
-                os.environ.get("TIMESTAMPED_REPORT_DIR", self.log_dir),
+                os.environ["TIMESTAMPED_REPORT_DIR"],
                 "logs.log"
             )
         else:
             log_filename = os.path.join(
-                os.environ.get("LATEST_REPORT_DIR", self.log_dir),
+                os.environ["LATEST_REPORT_DIR"],
                 "logs.log"
             )
         
