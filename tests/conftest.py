@@ -57,12 +57,6 @@ def pytest_runtest_makereport(item, call):
         driver = item.funcargs.get("driver")
         if driver is not None:
             LATEST_SCREENSHOT_DIR = os.environ["LATEST_SCREENSHOT_DIR"]
-            TIMESTAMPED_SCREENSHOT_DIR = os.environ[
-                "TIMESTAMPED_SCREENSHOT_DIR"
-            ]
-
-            os.makedirs(LATEST_SCREENSHOT_DIR, exist_ok=True)
-            os.makedirs(TIMESTAMPED_SCREENSHOT_DIR, exist_ok=True)
 
             file_name = (
                 f"{item.nodeid.replace('::', '_').replace('/', '_')}.png"
@@ -75,6 +69,10 @@ def pytest_runtest_makereport(item, call):
             driver.save_screenshot(latest_screenshot_path)
 
             if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
+                
+                TIMESTAMPED_SCREENSHOT_DIR = os.environ[
+                    "TIMESTAMPED_SCREENSHOT_DIR"
+                ]
                 archived_path = os.path.join(
                     TIMESTAMPED_SCREENSHOT_DIR,
                     file_name
