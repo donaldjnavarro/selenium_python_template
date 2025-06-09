@@ -204,7 +204,6 @@ This is turned on in the .env file with `PARALLEL=true`.
 > is on. Later we will either solve this, or as a compromise add logging to a local file.
 
 ### Page Object Models
-
 This repo uses a POM (Page Object Model) approach to structuring the logical details about actions that automation takes.
 
 A few patterns emerge:
@@ -227,3 +226,20 @@ Other items of note:
 This can be used in testing. Currently it is implemented in page model `is_loaded` checks for the page having loaded.
 
 All doms will be saved in a report subfolder to keep large runs tidy.
+
+### Logging
+
+We have implemented a custom logger.
+
+* Display syntax of logs is improved
+* Logs display in color
+* Logs are saved to a log file in the report folder
+* Logs are included in the HTML test report
+
+> NOTE: Code that runs during initial setup only has our "pre_logger" which will display logs to the console but may lack some enhancement features such as being included in the log file. Once the environmental variables are all loaded, the main logger launches, from which point full logging features become active.
+
+#### Customizing Log Level
+
+The .env file can be used to provide a specific log level for the main logger.
+
+Ex: LOG_LEVEL=WARNING will suppress all logs of lower levels, such as INFO, from the main logger
