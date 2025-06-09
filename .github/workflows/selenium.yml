@@ -37,7 +37,7 @@ jobs:
           touch .env
           echo CI=true >> .env
           echo HEADLESS=true >> .env
-          echo PARALLEL=true >> .env
+          echo PARALLEL=false >> .env
           echo SKIP_SECRETS=true >> .env
           echo CHROME=true >> .env
           echo EDGE=true >> .env
