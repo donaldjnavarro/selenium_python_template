@@ -219,3 +219,11 @@ A few patterns emerge:
 
 Other items of note:
 **APIs as page models** follow the same patterns as the web UI page models, though they have their own `BaseAPI` page model that serves as the API equivalent of `BasePage`.
+
+### Saving DOMs on failures
+
+*utils/dom.py* provides a utility to save the dom HTML of the current page. 
+
+This can be used in testing. Currently it is implemented in page model `is_loaded` checks for the page having loaded.
+
+All doms will be saved in a report subfolder to keep large runs tidy.
