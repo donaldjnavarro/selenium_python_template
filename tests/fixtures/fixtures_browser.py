@@ -69,14 +69,15 @@ def driver(request):
 
 
         # Create the Chrome driver instance
+        chrome_path = ChromeDriverManager().install()
         driver = webdriver.Chrome(
-            service=ChromeService(
-                ChromeDriverManager().install()
-            ), options=options
+            service=ChromeService(chrome_path),
+            options=options
         )
-
-        version = driver.capabilities['chrome']['chromedriverVersion']
-        logger.info(f"Chrome version: {version}")
+        logger.info(
+            f"Chrome version: "
+            f"{driver.capabilities['chrome']['chromedriverVersion']}"
+        )
 
     # Firefox
     elif browser == "firefox":
@@ -94,10 +95,13 @@ def driver(request):
 
         # Create the Firefox driver instance
         gecko = GeckoDriverManager().install()
-        service = FirefoxService(gecko)
-        driver = webdriver.Firefox(service=service, options=options)
-        firefox_version = driver.capabilities['browserVersion']
-        logger.info(f"Firefox version: {firefox_version}")
+        driver = webdriver.Firefox(
+            service=FirefoxService(gecko),
+            options=options
+        )
+        logger.info(
+            f"Firefox version: {driver.capabilities['browserVersion']}"
+        )
 
     # Edge
     elif browser == "edge":
@@ -113,13 +117,13 @@ def driver(request):
             options.add_argument("--disable-dev-shm-usage")
         
         # Create the Edge driver instance
+        edge_path = EdgeChromiumDriverManager().install()
         driver = webdriver.Edge(
-            service=EdgeService(
-                EdgeChromiumDriverManager().install()
-            ), options=options
+            service=EdgeService(edge_path),
+            options=options
         )
-        edge_version = driver.capabilities['browserVersion']
-        logger.info(f"Edge version: {edge_version}")
+        logger.info(f"Edge version: {driver.capabilities['browserVersion']}")
+
     else:
         raise ValueError(f"Unsupported browser: {browser}")
 
