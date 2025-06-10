@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-
 import pytest
 from shutil import copyfile
 
@@ -24,10 +23,6 @@ if "RUN_TIMESTAMP" not in os.environ:
         "\n  `poetry run test`"
     )
 
-def pytest_addoption(parser):
-    """Space for adding custom command line options for pytest"""
-    pass
-
 def pytest_collection_modifyitems(config, items):
     """Pytest hook to skip tests based on user configurations"""
     skip = pytest.mark.skip(reason="Skipping tests that require secrets")
@@ -37,13 +32,7 @@ def pytest_collection_modifyitems(config, items):
                 item.add_marker(skip)
 
     # Log the collection status
-    logger.info(f"Modified {len(items)} test items.")
-
-def pytest_configure(config):
-    """Pytest hook to configure pytest settings"""
-
-    # # Logging configurations
-    # LogConfigurator().configure()
+    logger.info(f"Found {len(items)} test items.")
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
@@ -82,3 +71,11 @@ def pytest_runtest_makereport(item, call):
                 extra = getattr(rep, "extra", [])
                 extra.append(extras.image(latest_screenshot_path))
                 rep.extra = extra
+
+def pytest_configure(config):
+    """Pytest hook to configure pytest settings"""
+    pass
+
+def pytest_addoption(parser):
+    """Space for adding custom command line options for pytest"""
+    pass
