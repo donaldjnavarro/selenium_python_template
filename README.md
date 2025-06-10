@@ -1,5 +1,7 @@
 # Python Selenium Template
 
+This repo provides a basic framework for an automated test suite, with custom enhancements.
+
 ## Getting Started
 
 ### Secrets and personal configurations
