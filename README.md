@@ -145,6 +145,15 @@ poetry run lint_fix_rule I001
 
 Details are configured in *.github\workflows\selenium.yml*
 
+#### Required Checks
+
+* Linting is required for PR merges
+* All tests passing is required for PR merges (With some exceptions, see below)
+
+#### CI Reports
+
+In addition to the standard Github Actions report on the results of required checks, we also save test failure DOMs as well as the test report HTML, both of which can be found in the Github Actions artifacts.
+
 #### CI Exclusions: Skipping tests that use secrets
 
 To provide a more secure CICD implementation, we have handling that will skip any test that uses secrets.
