@@ -15,7 +15,7 @@ import logging
 logger = logging.getLogger()
 
 # Default timeout
-DEFAULT_TIMEOUT = int(os.getenv("DEFAULT_WAIT_TIMEOUT", 10))
+DEFAULT_TIMEOUT = int(os.getenv("MAX_WAIT", 10))
 
 class Timing:
     """Utility class for handling timing actions"""
