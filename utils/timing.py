@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 # Third-party imports
-import logging
 import os
 import time
 
@@ -12,10 +11,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 # Logging tools
-logger = logging.getLogger(__name__)
+import logging
+logger = logging.getLogger()
 
 # Default timeout
-DEFAULT_TIMEOUT = int(os.getenv("DEFAULT_WAIT_TIMEOUT", 10))
+DEFAULT_TIMEOUT = int(os.getenv("MAX_WAIT", 10))
 
 class Timing:
     """Utility class for handling timing actions"""

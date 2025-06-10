@@ -2,19 +2,21 @@
 from __future__ import annotations
 
 import os
-import subprocess
+import pytest
 import sys
 import shutil
 import datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
-from logging import getLogger
-
-logger = getLogger(__name__)
+import logging
+from utils.logging import pre_logger
+from utils.logging import main_logger
+logger = logging.getLogger()
 
 def set_runtime_env_vars():
     """Set up and standardize environment variables for test reports."""
+    logger.info("Running set_runtime_env_vars() in run_tests.py")
     # Standardize the name and location of the report directories
     REPORT_FOLDER = "reports"
     LATEST_FOLDER = "latest"
@@ -241,11 +243,12 @@ class PytestCommandBuilder:
         """
         return self.command + self._args
 
-def historical_report(current_report_path: str | None = None):
+def create_historical_report(current_report_path: str | None = None):
     """Copy the current test report to a timestamped archive.
 
     Only acts if toggled on in .env
     """
+    logger.info("Running create_historical_report() in run_tests.py")
     if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
         archive_report = (
             f"{os.getenv(
@@ -254,6 +257,7 @@ def historical_report(current_report_path: str | None = None):
             )}"
             f"/test_report.html"
         )
+        logger.info(f"Saving historical report in {archive_report}")
         os.makedirs(os.path.dirname(archive_report), exist_ok=True)
         if os.path.exists(current_report_path):
             shutil.copyfile(current_report_path, archive_report)
@@ -262,10 +266,17 @@ def historical_report(current_report_path: str | None = None):
 
 def main():
     """Handle all customization for running tests with a single command"""
+    # Create barebones logger for everything that runs before 
+    # the full logger has everything it needs
+    pre_logger()
+    
     # Set up environment variables
     load_dotenv()
     set_runtime_env_vars()
     create_folders()
+
+    # Create logger
+    main_logger()
 
     # Prepare pytest command for the console
     user_args = sys.argv[1:]
@@ -273,14 +284,13 @@ def main():
     cmd = pytest_command_builder.full_command
 
     # Run the full pytest command
-    print(f"Running test command: {' '.join(
-        cmd
-    )}")
-    print(f"Test run started at {os.environ['RUN_TIMESTAMP']}")
-    subprocess.run(cmd)
+    logger.info(f"Running test command: {' '.join(cmd)}")
+    logger.info(f"Test run started at {os.environ['RUN_TIMESTAMP']}")
+    exit_code = pytest.main(cmd[1:])
 
     # Copy the test report into an archive with a timestamp
-    historical_report(pytest_command_builder.report_path)
+    create_historical_report(pytest_command_builder.report_path)
+    sys.exit(exit_code)
 
 if __name__ == "__main__":
     main()

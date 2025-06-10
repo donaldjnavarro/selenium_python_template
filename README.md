@@ -80,7 +80,8 @@ By adding the following argument when we send the test command, only tests with 
 
 By default, Pytest will use its fixtures to all tests and then continue to the next web browser and run all the tests again.
 
-Which browsers are included in this coverage can be customized in the *.env* file
+* Which browsers are included in this coverage can be customized in the *.env* file
+* Browser dimensions can be specified in the .env, otherwise will use defaults set in **/fixtures/fixtures_browser.py**
 
 ## Overview
 
@@ -144,6 +145,15 @@ poetry run lint_fix_rule I001
 **Github Actions** are configured to require certain checks pass before a Pull Request is considered valid.
 
 Details are configured in *.github\workflows\selenium.yml*
+
+#### Required Checks
+
+* Linting is required for PR merges
+* All tests passing is required for PR merges (With some exceptions, see below)
+
+#### CI Reports
+
+In addition to the standard Github Actions report on the results of required checks, we also save test failure DOMs as well as the test report HTML, both of which can be found in the Github Actions artifacts.
 
 #### CI Exclusions: Skipping tests that use secrets
 
@@ -227,3 +237,20 @@ Other items of note:
 This can be used in testing. Currently it is implemented in page model `is_loaded` checks for the page having loaded.
 
 All doms will be saved in a report subfolder to keep large runs tidy.
+
+### Logging
+
+We have implemented a custom logger.
+
+* Display syntax of logs is improved
+* Logs display in color
+* Logs are saved to a log file in the report folder
+* Logs are included in the HTML test report
+
+> NOTE: Code that runs during initial setup only has our "pre_logger" which will display logs to the console but may lack some enhancement features such as being included in the log file. Once the environmental variables are all loaded, the main logger launches, from which point full logging features become active.
+
+#### Customizing Log Level
+
+The .env file can be used to provide a specific log level for the main logger.
+
+Ex: LOG_LEVEL=WARNING will suppress all logs of lower levels, such as INFO, from the main logger

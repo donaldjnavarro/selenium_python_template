@@ -28,7 +28,7 @@ class NYCraigslistHomePage(BasePage):
         
         Timing.wait_until_true(
             lambda: self.get_element("search_box").is_displayed(),
-            message="Search box is not displayed on the Wikipedia home page."
+            message="Search box is not displayed on the Craigslist home page."
         )
 
     def search(self, query: str):

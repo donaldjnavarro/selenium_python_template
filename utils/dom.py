@@ -5,7 +5,7 @@ from pathlib import Path
 from functools import wraps
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger()
 
 def save_dom(driver, filename="page_dump.html"):
     """Save the current DOM from the Selenium driver to a local HTML file.
