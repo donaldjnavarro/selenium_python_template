@@ -31,9 +31,6 @@ def pytest_collection_modifyitems(config, items):
             if os.getenv("SKIP_SECRETS", "true").lower() == "true":
                 item.add_marker(skip)
 
-    # Log the collection status
-    logger.info(f"Found {len(items)} test items.")
-
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     """Capture screenshots on test failure and attach to HTML report."""
