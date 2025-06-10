@@ -80,7 +80,8 @@ By adding the following argument when we send the test command, only tests with 
 
 By default, Pytest will use its fixtures to all tests and then continue to the next web browser and run all the tests again.
 
-Which browsers are included in this coverage can be customized in the *.env* file
+* Which browsers are included in this coverage can be customized in the *.env* file
+* Browser dimensions can be specified in the .env, otherwise will use defaults set in **/fixtures/fixtures_browser.py**
 
 ## Overview
 
@@ -213,6 +214,7 @@ This is turned on in the .env file with `PARALLEL=true`.
 > is on. Later we will either solve this, or as a compromise add logging to a local file.
 
 ### Page Object Models
+
 This repo uses a POM (Page Object Model) approach to structuring the logical details about actions that automation takes.
 
 A few patterns emerge:
