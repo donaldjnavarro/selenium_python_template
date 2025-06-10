@@ -46,8 +46,5 @@ def test_example_wikipedia(driver):
         f"but actual: '{driver.title}'"
     )
 
-    # Clean up
-    driver.quit()
-
 if __name__ == "__main__":
     test_example_wikipedia()

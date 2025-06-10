@@ -44,8 +44,5 @@ def test_example_craigslist(driver):
         f"but received: '{driver.title}'"
     )
 
-    # Clean up
-    driver.quit()
-
 if __name__ == "__main__":
         test_example_craigslist()
