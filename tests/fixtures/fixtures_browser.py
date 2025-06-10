@@ -62,6 +62,7 @@ def driver(request):
             options.add_argument(f"--window-size={DEFAULT_BROWSER_WIDTH},{DEFAULT_BROWSER_HEIGHT}")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
+            options.add_argument("--log-level=3")  # Suppress INFO/WARNING logs
 
             # Use new headless mode if Chrome version supports it
             options.add_argument("--headless=new")
