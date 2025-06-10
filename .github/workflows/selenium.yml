@@ -51,6 +51,13 @@ jobs:
           unset DISPLAY
             poetry run test --maxfail=1 --disable-warnings -v -m "not fail"
 
+      - name: Upload failed DOM snapshot
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-dom
+          path: reports/latest/dom/*.html
+
   lint:
     timeout-minutes: 60
     # Ubuntu version is limited for firefox compatibility for libraries (libasound2, libgconf-2-4)
