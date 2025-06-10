@@ -30,6 +30,17 @@ browserConfigs = {
     "edge": os.getenv("EDGE", "true").lower() == "true"
 }
 
+DEFAULT_BROWSER_WIDTH = os.environ.get("BROWSER_WIDTH", "1920")
+DEFAULT_BROWSER_HEIGHT = os.environ.get("BROWSER_HEIGHT", "1080")
+def apply_window_size(
+    driver,
+    headless: bool,
+    width=DEFAULT_BROWSER_WIDTH,
+    height=DEFAULT_BROWSER_HEIGHT
+):
+    """Resize the window"""
+    driver.set_window_size(int(width), int(height))
+
 browserCoverage = [name for name, enabled in browserConfigs.items() if enabled]
 @pytest.fixture(params=browserCoverage)
 def driver(request):
@@ -48,7 +59,7 @@ def driver(request):
         # Headless Chrome configuration
         if headless:
             options.add_argument("--disable-gpu")
-            options.add_argument("--window-size=1920,1080")
+            options.add_argument(f"--window-size={DEFAULT_BROWSER_WIDTH},{DEFAULT_BROWSER_HEIGHT}")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
 
@@ -77,8 +88,8 @@ def driver(request):
             # options.headless = True
             # Force the newest headless mode approach, especially for CICD
             options.add_argument("--headless=new")
-            options.add_argument("--width=1920")
-            options.add_argument("--height=1080")
+            options.add_argument(f"--width={DEFAULT_BROWSER_WIDTH}")
+            options.add_argument(f"--height={DEFAULT_BROWSER_HEIGHT}")
 
         # Create the Firefox driver instance
         gecko = GeckoDriverManager().install()
@@ -96,7 +107,7 @@ def driver(request):
         if headless:
             options.add_argument("--headless")
             options.add_argument("--disable-gpu")
-            options.add_argument("--window-size=1920,1080")
+            options.add_argument(f"--window-size={DEFAULT_BROWSER_WIDTH},{DEFAULT_BROWSER_HEIGHT}")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
         
@@ -111,6 +122,6 @@ def driver(request):
     else:
         raise ValueError(f"Unsupported browser: {browser}")
 
-    driver.maximize_window()
+    apply_window_size(driver, headless)
     yield driver
     driver.quit()
