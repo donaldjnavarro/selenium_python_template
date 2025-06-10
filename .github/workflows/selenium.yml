@@ -36,7 +36,7 @@ jobs:
         run: |
           touch .env
           echo CI=true >> .env
-          echo HEADLESS=false >> .env
+          echo HEADLESS=true >> .env
           echo PARALLEL=false >> .env
           echo SKIP_SECRETS=true >> .env
           echo CHROME=true >> .env
