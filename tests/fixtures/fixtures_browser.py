@@ -23,9 +23,6 @@ from webdriver_manager.microsoft import EdgeChromiumDriverManager
 import logging
 logger = logging.getLogger()
 
-# Determine if the .env file has been configured for headless mode
-headless = os.getenv("HEADLESS", "false").lower() == "true"
-
 # Browser fixtures
 browserConfigs = {
     "chrome": os.getenv("CHROME", "true").lower() == "true",
@@ -40,6 +37,9 @@ def driver(request):
     logger.info("Running driver() in fixtures_browser.py")
     browser = request.param
 
+    # Determine if the .env file has been configured for headless mode
+    headless = os.environ.get("HEADLESS", "false").lower() == "true"
+
     # Chrome
     if browser == "chrome":
         # Chrome base options
@@ -47,11 +47,14 @@ def driver(request):
 
         # Headless Chrome configuration
         if headless:
-            options.add_argument("--headless")
             options.add_argument("--disable-gpu")
             options.add_argument("--window-size=1920,1080")
             options.add_argument("--no-sandbox")
             options.add_argument("--disable-dev-shm-usage")
+
+            # Use new headless mode if Chrome version supports it
+            options.add_argument("--headless=new")
+
 
         # Create the Chrome driver instance
         driver = webdriver.Chrome(
