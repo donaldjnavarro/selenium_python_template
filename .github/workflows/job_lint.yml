@@ -1,0 +1,32 @@
+name: Lint job
+
+on:
+  workflow_call:
+    inputs:
+      env_file:
+        required: false
+        type: string
+
+jobs:
+    lint:
+      timeout-minutes: 60
+      # Ubuntu version is limited for firefox compatibility for libraries (libasound2, libgconf-2-4)
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Set up Python
+          uses: actions/setup-python@v4
+          with:
+            python-version: "3.13.1"
+
+        - name: Install Poetry
+          run: |
+            curl -sSL https://install.python-poetry.org | python3 -
+            echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+        - name: Install dependencies
+          run: poetry install
+
+        - name: Run linter
+          run: poetry run ruff check .

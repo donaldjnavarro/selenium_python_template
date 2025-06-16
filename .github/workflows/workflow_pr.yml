@@ -1,0 +1,11 @@
+name: Pull Request Workflows
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  run-lint:
+    uses: ./.github/workflows/job_lint.yml
+  run-tests:
+    uses: ./.github/workflows/job_tests.yml
