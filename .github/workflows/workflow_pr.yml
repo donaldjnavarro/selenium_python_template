@@ -4,7 +4,7 @@ on:
   pull_request:
 
 jobs:
-  run-lint:
+  pr-lint:
     uses: ./.github/workflows/job_lint.yml
-  run-tests:
+  pr-tests:
     uses: ./.github/workflows/job_tests.yml
