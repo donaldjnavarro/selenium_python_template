@@ -1,0 +1,10 @@
+name: Weekly regression
+
+on:
+  schedule:
+    - cron: '0 10 * * 1'  # 6 AM ET = 10 AM UTC on Monday
+  workflow_dispatch:       # Optional: allows manual trigger via GitHub UI
+
+jobs:
+  run-tests:
+    uses: ./.github/workflows/job_tests.yml

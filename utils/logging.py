@@ -29,16 +29,18 @@ def colorize_level(level_name: str) -> str:
 
 def pre_logger():
     """Minimal logger setup for early-stage logging (before full config)."""
-    prelogger_level = logging.INFO
-    logging.basicConfig(
-        level=prelogger_level,
-        stream=sys.stdout,
-        format=LOG_FORMAT,
-        datefmt=DATE_FORMAT
-    )
-    logging.info(
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+
+    handler = logging.StreamHandler(sys.stdout)
+    formatter = LogFormatter(color=True)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    logger.info(
         "Loading pre logger at level [{}]".format(
-            colorize_level(logging.getLevelName(prelogger_level))
+            colorize_level(logging.getLevelName(logging.INFO))
         )
     )
 
@@ -181,6 +183,10 @@ class LogConfigurator:
         self.logger.setLevel(self.level)
         self.logger.addHandler(self._create_console_handler())
         self.logger.addHandler(self._create_file_handler())
+
+        # External packages log management
+        logging.getLogger("WDM").setLevel(logging.WARNING)
+
         # If we want to keep old logs, we will save a second copy 
         # of the log with a timestamp in its filename
         if os.getenv("SAVE_HISTORICAL_REPORTS", "false").lower() == "true":
