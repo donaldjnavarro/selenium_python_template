@@ -767,7 +767,7 @@ zstd = ["zstandard (>=0.18.0)"]
 name = "webdriver-manager"
 version = "4.0.2"
 description = "Library provides the way to automatically manage drivers for different browsers"
-optional = false
+optional = true
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
@@ -815,4 +815,4 @@ h11 = ">=0.9.0,<1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.8"
-content-hash = "9f504bc984a2b87ea243a52fb90b377ac3849d4e43f6d16f2abee7dc3f2977ed"
+content-hash = "ca0478bf39176c6069c3eb7a7a94e41e5ed15be631807ce183708a506f188b22"
