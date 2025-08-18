@@ -12,12 +12,10 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.edge.options import Options as EdgeOptions
-from selenium.webdriver.edge.service import Service as EdgeService
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 # Launch the logger
 import logging
@@ -30,8 +28,8 @@ browserConfigs = {
     "edge": os.getenv("EDGE", "true").lower() == "true"
 }
 
-DEFAULT_BROWSER_WIDTH = os.environ.get("BROWSER_WIDTH", "1920")
-DEFAULT_BROWSER_HEIGHT = os.environ.get("BROWSER_HEIGHT", "1080")
+DEFAULT_BROWSER_WIDTH = int(os.environ.get("BROWSER_WIDTH", "1920"))
+DEFAULT_BROWSER_HEIGHT = int(os.environ.get("BROWSER_HEIGHT", "1080"))
 def apply_window_size(
     driver,
     headless: bool,
@@ -69,7 +67,11 @@ def driver(request):
 
 
         # Create the Chrome driver instance
-        chrome_path = ChromeDriverManager().install()
+        try:
+            chrome_path = ChromeDriverManager().install()
+        except Exception as e:
+            logger.error("ChromeDriver download failed: %s", e)
+
         driver = webdriver.Chrome(
             service=ChromeService(chrome_path),
             options=options
@@ -94,7 +96,11 @@ def driver(request):
             options.add_argument(f"--height={DEFAULT_BROWSER_HEIGHT}")
 
         # Create the Firefox driver instance
-        gecko = GeckoDriverManager().install()
+        try:
+            gecko = GeckoDriverManager().install()
+        except Exception as e:
+            logger.error("GeckoDriver download failed: %s", e)
+
         driver = webdriver.Firefox(
             service=FirefoxService(gecko),
             options=options
@@ -117,11 +123,7 @@ def driver(request):
             options.add_argument("--disable-dev-shm-usage")
         
         # Create the Edge driver instance
-        edge_path = EdgeChromiumDriverManager().install()
-        driver = webdriver.Edge(
-            service=EdgeService(edge_path),
-            options=options
-        )
+        driver = webdriver.Edge(options=options)
         logger.info(f"Edge version: {driver.capabilities['browserVersion']}")
 
     else:

@@ -11,15 +11,15 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.8"
-selenium = "*" # UI automation library
+selenium = "^4.11" # UI automation library
 pytest = "*" # Testing framework
 pytest-xdist = "*" # Provides parallel test execution
 python-dotenv = "*" # .env file support
 cffi = "==1.17.0" # Brittle dependency for Selenium
 requests = "*" # API request handling
-webdriver-manager = "*" # Browser driver management so users don't have to manually provide them
 ruff = "^0.11.11" # linter
 pytest-html = "^4.1.1" #html test reports
+webdriver-manager = "^4.0.2"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
