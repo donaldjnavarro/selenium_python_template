@@ -22,7 +22,10 @@ def pytest_collection_modifyitems(config, items):
     """Skip tests that require secrets if SKIP_SECRETS is True"""
     skip = pytest.mark.skip(reason="Skipping tests that require secrets")
     for item in items:
-        if "secrets" in item.keywords and os.getenv("SKIP_SECRETS", "true").lower() == "true":
+        if (
+            "secrets" in item.keywords
+            and os.getenv("SKIP_SECRETS", "true").lower() == "true"
+        ):
             item.add_marker(skip)
 
 
@@ -36,7 +39,9 @@ def pytest_runtest_makereport(item, call):
         driver = item.funcargs.get("driver")
         if driver:
             latest_dir = os.environ["LATEST_SCREENSHOT_DIR"]
-            file_name = f"{item.nodeid.replace('::', '_').replace('/', '_')}.png"
+            file_name = (
+                f"{item.nodeid.replace('::', '_').replace('/', '_')}.png"
+            )
             latest_path = os.path.join(latest_dir, file_name)
 
             driver.save_screenshot(latest_path)
