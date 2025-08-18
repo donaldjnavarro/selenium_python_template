@@ -38,5 +38,10 @@ def test_example_postman_basic_auth():
     api = PostmanEchoAPI().with_auth(username, password)
     response = api.basic_auth()
 
-    assert response.status_code == 200
-    assert response.json() == {"authenticated": True}
+    assert response.status_code == 200, (
+        f"Basic auth test expected status code 200, got {response.status_code}"
+    )
+    assert response.json() == {"authenticated": True}, (
+        "Basic auth test expected Postman Echo response to have "
+        "'authenticated' boolean in JSON body"
+    )

@@ -17,7 +17,6 @@ pytest-xdist = "*" # Provides parallel test execution
 python-dotenv = "*" # .env file support
 cffi = "==1.17.0" # Brittle dependency for Selenium
 requests = "*" # API request handling
-webdriver-manager = {version = "^4.0.1", optional = true}
 ruff = "^0.11.11" # linter
 pytest-html = "^4.1.1" #html test reports
 
