@@ -19,6 +19,7 @@ cffi = "==1.17.0" # Brittle dependency for Selenium
 requests = "*" # API request handling
 ruff = "^0.11.11" # linter
 pytest-html = "^4.1.1" #html test reports
+webdriver-manager = "^4.0.2"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
